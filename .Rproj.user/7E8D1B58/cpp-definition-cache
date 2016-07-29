@@ -1,0 +1,50 @@
+[
+    {
+        "definitions" : [
+            {
+                "column" : 15,
+                "file" : "/home/leo/Documents/Dropbox/Rpackage/lcopula/src/densities.cpp",
+                "kind" : 6,
+                "line" : 14,
+                "name" : "dens_const(NumericVector, NumericVector)",
+                "parent_name" : "",
+                "usr" : "c:@F@dens_const#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#S0_#"
+            },
+            {
+                "column" : 15,
+                "file" : "/home/leo/Documents/Dropbox/Rpackage/lcopula/src/densities.cpp",
+                "kind" : 6,
+                "line" : 30,
+                "name" : "b_const(NumericVector, NumericVector)",
+                "parent_name" : "",
+                "usr" : "c:@F@b_const#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#S0_#"
+            },
+            {
+                "column" : 15,
+                "file" : "/home/leo/Documents/Dropbox/Rpackage/lcopula/src/densities.cpp",
+                "kind" : 6,
+                "line" : 57,
+                "name" : "spectraldensity(NumericVector, NumericVector, NumericVector)",
+                "parent_name" : "",
+                "usr" : "c:@F@spectraldensity#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#S0_#S0_#"
+            }
+        ],
+        "file" : "/home/leo/Documents/Dropbox/Rpackage/lcopula/src/densities.cpp",
+        "file_last_write" : 1440346825
+    },
+    {
+        "definitions" : [
+            {
+                "column" : 15,
+                "file" : "/home/leo/Documents/Dropbox/Rpackage/lcopula/src/generic.cpp",
+                "kind" : 6,
+                "line" : 13,
+                "name" : "marginCombo(NumericVector, NumericMatrix)",
+                "parent_name" : "",
+                "usr" : "c:@F@marginCombo#$@N@Rcpp@C@Vector>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#$@N@Rcpp@C@Matrix>#VI14#@N@Rcpp@CT>1#T@PreserveStorage#"
+            }
+        ],
+        "file" : "/home/leo/Documents/Dropbox/Rpackage/lcopula/src/generic.cpp",
+        "file_last_write" : 1440361264
+    }
+]

@@ -1,0 +1,24 @@
+Package: lcopula
+Type: Package
+Title: Liouville Copulas
+Version: 0.206
+Date: 2016-07-05
+Authors@R: c(person("Leo", "Belzile", role = c("aut", "cre"),
+                     email = "leo.belzile@epfl.ch"),
+              person("Christian", " Genest", role = c("aut","ctb")),
+              person("Alexander", "J. McNeil", role = c("ctb")),
+              person("Johanna", "G. Neslehova", role = c("ctb")))
+Description: Collections of functions allowing random number generations and
+    estimation of Liouville copulas.
+License: GPL-3
+Imports:
+    Rcpp (>= 0.11.4),
+    pcaPP,
+    utils,
+    graphics,
+    stats
+Depends:
+    copula (>= 0.999-12),
+    R (>= 2.12.0)
+LinkingTo: Rcpp
+RoxygenNote: 5.0.1
