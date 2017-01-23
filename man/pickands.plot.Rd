@@ -13,7 +13,7 @@ pickands.plot(rho, alpha, plot.new = T, CDA = c("C", "S"), tikz = F, ...)
 
 \item{plot.new}{boolean indicating whether a new plotting device should be called}
 
-\item{CDA}{whether to plot Pickands function for the extremal model of the 
+\item{CDA}{whether to plot Pickands function for the extremal model of the
 copula (\code{C}) or the survival copula (\code{S}), which is the scaled Dirichlet}
 
 \item{tikz}{boolean specifying whether to prepare plot for \code{tikz} output. Defaults to \code{F}}

@@ -4,7 +4,7 @@
 \alias{pliouv.opt}
 \title{Internal code for the copula likelihood function of Liouville copulas}
 \usage{
-pliouv.opt(theta, data, family, alphavec, MC.approx = T)
+pliouv.opt(theta, data, family, alphavec, MC.approx = TRUE)
 }
 \arguments{
 \item{theta}{parameter of the corresponding Archimedean copula}

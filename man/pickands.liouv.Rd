@@ -21,7 +21,7 @@ value of Pickands function for the scaled Dirichlet EV model
 \description{
 Pickands dependence function as in \cite{Belzile (2014), Proposition 40 and Example 4} and
 \cite{Belzile (2014), Proposition 41}, assuming that the parameter alpha is integer-valued.
-Returns the Pickands dependence function of the copula domain of attraction (CDA) 
+Returns the Pickands dependence function of the copula domain of attraction (CDA)
 of the survival copula, the scaled Dirichlet extreme value model, or the CDA of the copula, the Liouville EV model.
 }
 \examples{

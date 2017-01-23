@@ -17,22 +17,22 @@ K.plot(data, add = F, ...)
 The Kendall plot corresponding to the data at hand
 }
 \description{
-This function plots the expectation of the order statistics under the null 
+This function plots the expectation of the order statistics under the null
 hypothesis of independence against the ordered empirical copula values. The
 data is transformed to ranks.
 }
 \details{
 The function uses \code{integrate} and may fail for large \code{d} or large \code{n}. If \eqn{n>200}, the fallback is to generate
-a corresponding sample of uniform variates and to compare the empirical copula of the sample generated under the null hypothesis with the one 
+a corresponding sample of uniform variates and to compare the empirical copula of the sample generated under the null hypothesis with the one
 obtained from the sample.
 }
 \examples{
 #Independence
-K.plot(matrix(runif(2000),ncol=2)) 
+K.plot(matrix(runif(2000),ncol=2))
 #Negative dependence
-K.plot(rCopula(n=1000,claytonCopula(param=-0.5,dim=2)),add=TRUE,col=2) 
+K.plot(rCopula(n=1000,claytonCopula(param=-0.5,dim=2)),add=TRUE,col=2)
 #Perfect negative dependence
-K.plot(rCopula(n=1000,claytonCopula(param=-1,dim=2)),add=TRUE,col=6) 
+K.plot(rCopula(n=1000,claytonCopula(param=-1,dim=2)),add=TRUE,col=6)
 #Positive dependence
 K.plot(rCopula(n=1000,claytonCopula(param=iTau(claytonCopula(0.3),0.5),dim=2)),add=TRUE,col=3)
 #Perfect positive dependence

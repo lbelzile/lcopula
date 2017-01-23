@@ -4,7 +4,7 @@
 \alias{H_inv}
 \title{Inverse survival function if Monte-Carlo approximation is set to \code{TRUE} in \code{liouv.maxim}}
 \usage{
-H_inv(u, alphavec, family, theta, MC = 1e+05, TRUNC = F)
+H_inv(u, alphavec, family, theta, MC = 1e+05, TRUNC = FALSE)
 }
 \arguments{
 \item{u}{data at which to compute the survival inverse}
@@ -30,7 +30,7 @@ u <- rliouv(n = 100, family = "frank", alphavec <- c(2,3), theta = 1)
 H_inv(u=u, family="frank", alphavec=c(2,3), theta=2)
 #Difference between true value and approximation (can be large depending on family)
 sum(abs(H_inv(u=u, family="frank", alphavec=c(2,3), theta=2)-
-isliouvm_m(u=u, family="frank", alphavec=c(2,3), theta=2)))
+isliouv_m(u=u, family="frank", alphavec=c(2,3), theta=2)))
 }
 \keyword{internal}
 

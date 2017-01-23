@@ -28,64 +28,21 @@
 #' Pickands dependence function for the copula domain of attraction of Liouville copulas
 #'
 #' Pickands dependence function as in \cite{Belzile (2014), Proposition 41}
-#' Returns the Pickands dependence function of the copula domain of attraction 
-#' of the copula. This is only derived and implemented in the bivariate case and 
-#' assuming that the parameter \code{alpha} is integer-valued
-#' 
+#' Returns the Pickands dependence function of the copula domain of attraction
+#' of the copula. This is only derived and implemented in the bivariate case.
+#'
 #' @param t pseudo-angle in (0,1)
 #' @param rho index of regular variation parameter
 #' @param alpha vector of Dirichlet allocations. Currently must be of length 2
-#' 
+#'
 #' @return value of Pickands function
 .pickands.fun.uni<-function(t, rho=0.5, alpha=c(1,1)) {
   if(t==0 && t==1){return(1)}
-  b<-function(k){
-    if(k>=2){
-      return(prod(seq(1,(k-1),by=1)-rho)*rho)
-    }
-    if(k==1){
-      return(rho)
-    }
-    if(k==0){
-      return(0)	
-    }
-    else{
-      stop("Invalid argument in function b")
-    }
-  }	
-  k=function(a){
-    gamma(a-rho)/(gamma(1-rho)*gamma(a))
-  }
-  
-  SUMS=1;
-  if(alpha[1]>=2){
-    for(i in 1:(alpha[1]-1)){
-      SUMS=SUMS-((.b(i,rho)/gamma(i+1))*
-                   ((k(alpha[2])*t)^(i/rho))/
-                   ((((k(alpha[2])*t)^(1/rho))+
-                       ((k(alpha[1])*(1-t))^(1/rho)))^(i)))
-    }
-  }
-  if(alpha[2]>=2){
-    for(j in 1:(alpha[2]-1)){
-      SUMS=SUMS-((.b(j,rho)/gamma(j+1))*
-                   ((k(alpha[1])*(1-t))^(j/rho))/
-                   ((((k(alpha[2])*t)^(1/rho))+
-                       ((k(alpha[1])*(1-t))^(1/rho)))^(j)))
-    }
-  }
-  if(alpha[1]>=2 && alpha[2] >=2){
-    for(i in 1:(alpha[1]-1)){
-      for(j in 1:(alpha[2]-1)){
-        SUMS=SUMS-(.b(i+j,rho)/(gamma(i+1)*gamma(j+1)))*
-          ((k(alpha[2])*t)^(i/rho))*
-          ((k(alpha[1])*(1-t))^(j/rho))/
-          ((((k(alpha[2])*t)^(1/rho))+
-              ((k(alpha[1])*(1-t))^(1/rho)))^(i+j))
-      }
-    }
-  }
-  return((((t/k(alpha[1]))^(1/rho)+((1-t)/k(alpha[2]))^(1/rho))^rho)*SUMS)
+  a <- lgamma(alpha-rho)-lgamma(alpha)
+  kappa <- exp((log(1-t)+a[2])/rho - log(exp((log(1-t)+a[2])/rho)+exp((log(t)+a[1])/rho)))
+  exp(log(1-t)+ pbeta(kappa, alpha[1]-rho, alpha[2],log.p=TRUE))+
+    exp(log(t)+ pbeta(1-kappa, alpha[2]-rho,alpha[1],log.p=TRUE))
+
 }
 
 .pickands.fun<-Vectorize(.pickands.fun.uni, vectorize.args=c("t"))
@@ -93,14 +50,14 @@
 #' Pickands dependence function for the copula domain of attraction of Liouville survival copulas
 #'
 #' Pickands dependence function as in \cite{Belzile (2014), Proposition 40 and Example 4}
-#' Returns the Pickands dependence function of the copula domain of attraction 
-#' of the survival copula, the scaled Dirichlet extreme value model. Currently only implemented in the bivariate case. 
+#' Returns the Pickands dependence function of the copula domain of attraction
+#' of the survival copula, the scaled Dirichlet extreme value model. Currently only implemented in the bivariate case.
 #' Setting \code{rho=1} yields the same output as the function in the \code{evd} package.
-#' 
+#'
 #' @param t pseudo-angle in (0,1)
 #' @param rho index of regular variation parameter
 #' @param alpha vector of Dirichlet allocations. Currently must be of length 2
-#' 
+#'
 #' @return value of Pickands function for the scaled extremal Dirichlet  model
 .pickands.dir.uni<-function(t,alpha,rho){
   if(t==0 && t==1){return(1)}
@@ -116,15 +73,15 @@
 #'
 #' Pickands dependence function as in \cite{Belzile (2014), Proposition 40 and Example 4} and
 #' \cite{Belzile (2014), Proposition 41}, assuming that the parameter alpha is integer-valued.
-#' Returns the Pickands dependence function of the copula domain of attraction (CDA) 
+#' Returns the Pickands dependence function of the copula domain of attraction (CDA)
 #' of the survival copula, the scaled Dirichlet extreme value model, or the CDA of the copula, the Liouville EV model.
-#' 
+#'
 #' @param t pseudo-angle in (0,1)
 #' @param rho index of regular variation parameter
 #' @param alpha vector of Dirichlet allocations. Currently must be of length 2
 #' @param CDA select the extremal attractor of the copula (\code{C}) or the survival copula (\code{S})
-#' 
-#' @examples 
+#'
+#' @examples
 #' pickands.liouv(seq(0,1,by=0.01),1,c(0.1,0.3),CDA="S")
 #' pickands.liouv(t = seq(0,1,by=0.01), rho = 0.5, alpha = c(1,3), CDA="C")
 #' @return value of Pickands function for the scaled Dirichlet EV model
@@ -142,20 +99,13 @@ pickands.liouv<-function(t, rho=0.5, alpha=c(1,1),CDA=c("C","S")){
     stop("rho must be positive")
   }
   if(length(rho)>1){
-    stop("Argument rho must be of length 1")
+    stop("Argument `rho' must be of length 1")
   }
-  if(CDA=="C" && (any(rho>=1) || any(rho<=0))){
-    stop("rho must be between (0,1)")
+  if(CDA=="C" && any(c(rho >= min(alpha), rho <= 0))){
+    stop("`rho must be between (0,min(alpha))")
   }
   if(any(alpha<=0)){
     stop("alpha must be positive")
-  }
-  if(missing(CDA)){
-    warning("Invalid input for argument `CDA`. Defaulting to `C`")
-    CDA = "C"
-  }
-  if(CDA=="C" && abs(round(alpha)-alpha)!=rep(0,length(alpha))){
-    stop("alpha must be integer-valued")
   }
   if(length(alpha)!=2){
     stop("Not implemented except in the bivariate case")
@@ -163,27 +113,27 @@ pickands.liouv<-function(t, rho=0.5, alpha=c(1,1),CDA=c("C","S")){
   if(CDA=="C"){
     return(.pickands.fun(t,rho=rho,alpha=alpha))
   } else if(CDA=="S"){
-    return(.pickands.dir(t,rho=rho,alpha=alpha)) 
+    return(.pickands.dir(t,rho=rho,alpha=alpha))
   }  else{
     return(NA)
   }
 }
 #' Plot Pickands dependence function for CDA of Liouville copulas
-#' 
+#'
 #' The function will draw the Pickands dependence function for output in \code{tikz} if
 #' the corresponding function is selected.
-#' 
+#'
 #' @param rho index of regular variation parameter
 #' @param alpha vector of Dirichlet allocations. Currently must be of length 2
 #' @param plot.new boolean indicating whether a new plotting device should be called
-#' @param CDA whether to plot Pickands function for the extremal model of the 
+#' @param CDA whether to plot Pickands function for the extremal model of the
 #' copula (\code{C}) or the survival copula (\code{S}), which is the scaled Dirichlet
 #' @param tikz boolean specifying whether to prepare plot for \code{tikz} output. Defaults to \code{F}
 #' @param ... additional arguments passed to \code{lines}
-#' 
+#'
 #' @return a plot of the Pickands dependence function
 #' @export
-#' @examples 
+#' @examples
 #' pickands.plot(rho=0.9, alpha=c(1,1), col="slateblue1", CDA="C")
 #' pickands.plot(rho=0.9, alpha=c(2,3), col="slateblue2", CDA="C", plot.new=FALSE)
 #' pickands.plot(rho=0.5, alpha=c(2,3), col="slateblue3", CDA="C", plot.new=FALSE)
@@ -198,17 +148,14 @@ pickands.plot<-function(rho, alpha, plot.new=T,CDA=c("C","S"), tikz=F, ...){
     warning("Setting default to Liouville CDA. Use CDA=`S` for the Dirichlet model")
   }
   if(length(rho)!=1){stop("rho must be 1-dimensional")}
-  if(CDA=="C" && abs(round(alpha)-alpha)!=rep(0,length(alpha))){
-    stop("alpha must be integer-valued")
-  }
   if(length(alpha)!=2){
     stop("Not implemented beyond bivariate case")
   }
   if(plot.new==T){
     plot.new()
     plot.window(c(0,1), c(0.5,1))
-    axis(side=2, at=seq(0.5,1,by=0.1), pos=0,las=2,tck=0.01) 
-    axis(side=1, at=seq(0,1,by=0.1), pos=0.5,las=0,tck=0.01) 
+    axis(side=2, at=seq(0.5,1,by=0.1), pos=0,las=2,tck=0.01)
+    axis(side=1, at=seq(0,1,by=0.1), pos=0.5,las=0,tck=0.01)
     #title("Pickands dependence function")
     #Empirical bounds
     lines(c(0,0.5),c(1,0.5),lty=3,col="gray")
@@ -219,9 +166,9 @@ pickands.plot<-function(rho, alpha, plot.new=T,CDA=c("C","S"), tikz=F, ...){
       mtext("$\\mathrm{A}(t)$", side=2, line=2)
     } else{
       mtext(expression(t), side=1, line=2)
-      mtext(expression(A(t)), side=2, line=2) 
+      mtext(expression(A(t)), side=2, line=2)
     }
-    
+
   }
   x = seq(0,1,by=0.001)
   if(CDA=="C"){
@@ -230,33 +177,33 @@ pickands.plot<-function(rho, alpha, plot.new=T,CDA=c("C","S"), tikz=F, ...){
   if(CDA=="S"){
     lines(x=x,y=.pickands.dir(x,alpha=alpha,rho=rho),type="l",...)
   }
-}	
+}
 #' Kendall plot
-#' 
-#' This function plots the expectation of the order statistics under the null 
+#'
+#' This function plots the expectation of the order statistics under the null
 #' hypothesis of independence against the ordered empirical copula values. The
 #' data is transformed to ranks.
-#' 
+#'
 #' The function uses \code{integrate} and may fail for large \code{d} or large \code{n}. If \eqn{n>200}, the fallback is to generate
-#' a corresponding sample of uniform variates and to compare the empirical copula of the sample generated under the null hypothesis with the one 
+#' a corresponding sample of uniform variates and to compare the empirical copula of the sample generated under the null hypothesis with the one
 #' obtained from the sample.
-#' 
+#'
 #' @author Pr. Christian Genest (the code was adapted for the multivariate case)
-#' 
+#'
 #' @param data a \code{n} by \code{d} matrix of observations
 #' @param add whether to superimpose lines to an existing graph. Default to \code{F}
 #' @param ... additional arguments passed to \code{points}
-#' 
+#'
 #' @return The Kendall plot corresponding to the data at hand
 #' @export
 #' @references Genest & Boies (2003). Detecting Dependence with Kendall Plots, \emph{The American Statistician}, \bold{57}(4), 275--284.
-#' @examples 
+#' @examples
 #' #Independence
-#' K.plot(matrix(runif(2000),ncol=2)) 
+#' K.plot(matrix(runif(2000),ncol=2))
 #' #Negative dependence
-#' K.plot(rCopula(n=1000,claytonCopula(param=-0.5,dim=2)),add=TRUE,col=2) 
+#' K.plot(rCopula(n=1000,claytonCopula(param=-0.5,dim=2)),add=TRUE,col=2)
 #' #Perfect negative dependence
-#' K.plot(rCopula(n=1000,claytonCopula(param=-1,dim=2)),add=TRUE,col=6) 
+#' K.plot(rCopula(n=1000,claytonCopula(param=-1,dim=2)),add=TRUE,col=6)
 #' #Positive dependence
 #' K.plot(rCopula(n=1000,claytonCopula(param=iTau(claytonCopula(0.3),0.5),dim=2)),add=TRUE,col=3)
 #' #Perfect positive dependence
@@ -307,10 +254,10 @@ K.plot <- function(data, add=F, ...){
       lines(c(0,seq),c(0,K0),lty=2)
       lines(c(1,0),c(0,0),lty=2)
     } else{
-      points(W,Hs,xlim=c(0,1),ylim=c(0,1),pch=4,cex=0.8, ...) 
+      points(W,Hs,xlim=c(0,1),ylim=c(0,1),pch=4,cex=0.8, ...)
     }
   }  else {
-    #Generate random uniforms and compute 
+    #Generate random uniforms and compute
     ind <- matrix(runif(n*d),nrow=n,ncol=d)
     Wind <- sort(H(ind))
     if(add==F){
@@ -327,15 +274,15 @@ K.plot <- function(data, add=F, ...){
 }
 
 #' Bivariate spectral density of the CDA of survival copula and copula of Liouville vectors
-#' 
+#'
 #' Computes the Liouville EV model or the scaled Dirichlet EV model spectral density
-#' 
+#'
 #' @param w vector of points at which to evaluate. Must be in the unit interval
 #' @param alpha vector of Dirichlet allocations (must be a vector of integers if \code{CDA="C"}), otherwise strictly positive.
 #' @param rho parameter of limiting model corresponding to index of regular variation, between \eqn{(0,1)}
 #' @param CDA copula domain of attraction of either Liouville copula, \code{C}, or its survival copula \code{S}
 #' @param useR whether to use the R code for the spectral density of \code{C}. Default to \code{F}. Implemented for compatibility reason.
-#' 
+#'
 #' @return a vector of the same length as \code{w}.
 #' @export
 #' @examples
@@ -394,17 +341,17 @@ hbvevdliouv <- function(w, alpha, rho, CDA=c("C","S"), useR=F){
     return(0.5*exp((a1/rho)*a+(a2/rho)*b-log(rho)-log(w)-log(1-w)-(a1+a2+rho)*log(exp((1/rho)*a)+exp((1/rho)*b))))
   }
   return(0)
-}  
+}
 
 .dir_density<-Vectorize(.diri_density, "w")
 
 
 .spectral_dens_R<-function(w, alpha, rho){
-  
+
   r1R<-function(w, alpha, rho){
     a0=log(.dens_const(alpha[1], rho))+log(w)
     b0=log(.dens_const(alpha[2], rho))+log(1-w)
-    
+
     return(-0.5*exp(rho*log(exp(-(1/rho)*a0)+exp(-(1/rho)*b0))-2*log(rho)-log(w)-log(1-w))*(
       sum(if(alpha[1]>1){
         sapply(1:(alpha[1]-1), function(i){
@@ -430,11 +377,11 @@ hbvevdliouv <- function(w, alpha, rho, CDA=c("C","S"), useR=F){
     ))
   }
   r1<-Vectorize(r1R, "w")
-  
+
   r2R<-function(w, alpha, rho){
     a0=log(.dens_const(alpha[1], rho))+log(w)
     b0=log(.dens_const(alpha[2], rho))+log(1-w)
-    
+
     return(exp(-log(2)-log(rho)+(rho-1)*log(exp(-(1/rho)*a0)+exp(-(1/rho)*b0)))*(
       exp(-(1/rho)*b0-log(1-w)-log(w))-exp(-(1/rho)*a0-log(1-w)-log(w)))*(
         sum(if(alpha[1]>1){
@@ -461,13 +408,13 @@ hbvevdliouv <- function(w, alpha, rho, CDA=c("C","S"), useR=F){
       ))
   }
   r2<-Vectorize(r2R, "w")
-  
-  
-  
+
+
+
   r3R<-function(w, alpha, rho){
     a0=log(.dens_const(alpha[1], rho))+log(w)
     b0=log(.dens_const(alpha[2], rho))+log(1-w)
-    
+
     return(0.5*((1-rho)/rho)*exp((rho-2)*log(exp(-(1/rho)*a0)+
                                                exp(-(1/rho)*b0))-(1/rho)*(a0+b0)-log(w)-log(1-w))*(
                                                  1- sum(sapply(0:(alpha[1]-1), function(i){
@@ -478,6 +425,6 @@ hbvevdliouv <- function(w, alpha, rho, CDA=c("C","S"), useR=F){
                                                ))
   }
   r3<-Vectorize(r3R, "w")
-  
+
   return(r1(w, alpha, rho)+r2(w, alpha, rho)+r3(w, alpha, rho))
 }
