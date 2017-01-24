@@ -20,3 +20,12 @@ pointwise over grid values for the parameter `alpha` and optimizes over `rho`. T
 ### Datasets
 
 Three datasets, `airquality`, `danube` and `nutrient` are included with the package.
+
+### Installation 
+The package is available from CRAN. For up-to-date versions, you can install it from from Github via
+
+```R
+devtools::install_github("lbelzile/lcopula")
+```
+
+after installing `devtools`.
