@@ -130,12 +130,14 @@ rarchi <-  function(n, family, d, theta){
 #' @export
 #' @seealso \code{\link{Liouville_marginal}}
 #' @examples
+#' \dontrun{
 #' #Multivariate density of Clayton Liouville copula
 #' x <- rliouv(n = 100, family = "clayton", alphavec <- c(2,3), theta = 2)
 #' dliouv(x=x, family="clayton", alphavec=c(2,3), theta=2, TRUE)
 #' #Distribution function, multivariate sample
 #' x <- rliouv(n=100, family="frank", theta=1.5, alphavec=c(2,3))
 #' pliouv(theta=1.5, x=x,family="frank", alphavec=c(2,3))
+#' }
 rliouv <-  function(n = 100, family, alphavec, theta, reverse = FALSE){
   family <-  match.arg(family, c("clayton","gumbel","frank","AMH","joe"))
   alphavec <- as.integer(alphavec)
@@ -196,6 +198,7 @@ rliouv <-  function(n = 100, family, alphavec, theta, reverse = FALSE){
 #' @return a vector  with the corresponding quantile, probability, survival probabilities
 #' @export
 #' @examples
+#' \dontrun{
 #' #Marginal density
 #' samp <- rliouv(n = 100, family = "clayton", alphavec <- c(2,3), theta = 2)
 #' dliouvm(x=samp[,1], family="clayton", alpha=2, theta=2)
@@ -206,6 +209,7 @@ rliouv <-  function(n = 100, family, alphavec, theta, reverse = FALSE){
 #' su <- sliouvm(1-x[,1], family="gumbel", alpha=alphavec[1], theta=2)
 #' isliouvm(u=su, family="clayton", alpha=2, theta=2)
 #' #pliouv is the same as sliouv(isliouvm)
+#' }
 #' @rdname  Liouville_marginal
 #' @export
 sliouvm <- function(x, family, alpha, theta){
@@ -338,7 +342,7 @@ isliouvm <-  function(u, family, alpha, theta){
 #' @param theta parameter of the corresponding Archimedean copula
 #' @return a vector of same length as \code{u} with the quantile at 1-u
 #' @examples
-#' u <- rliouv(n = 100, family = "clayton", alphavec <- c(2,3), theta = 2)
+#' u <- rliouv(n = 10, family = "clayton", alphavec <- c(2,3), theta = 2)
 #' isliouv_m(u=u, family="clayton", alphavec=c(2,3), theta=2)
 isliouv_m <-  function(u, family, alphavec, theta){
   alphavec <- as.integer(alphavec)
@@ -608,11 +612,11 @@ pliouv.opt <-  function(theta, data, family, alphavec, MC.approx = TRUE){
 #'  liouv.maxim(data=data, family="j", interval=c(1.25,3), boundary=c(2,2),return_all=TRUE)
 #'  lattice.mat <- t(combn(1:3,2))
 #'  liouv.maxim(data=data, family="j", interval=c(1.25,3), lattice.mat=lattice.mat, return_all=FALSE)
+#'  #data <- rliouv(n=1000, family="gumbel", alphavec=c(1,2), theta=2)
+#'  liouv.maxim.mm(data=data, family="gumbel", boundary=c(3,3),return_all=TRUE)
+#'  lattice.mat <- t(combn(1:3,2))
+#'  liouv.maxim.mm(data=data, family="gumbel", lattice.mat=lattice.mat, return_all=FALSE)
 #' }
-#' data <- rliouv(n=1000, family="gumbel", alphavec=c(1,2), theta=2)
-#' liouv.maxim.mm(data=data, family="gumbel", boundary=c(3,3),return_all=TRUE)
-#' lattice.mat <- t(combn(1:3,2))
-#' liouv.maxim.mm(data=data, family="gumbel", lattice.mat=lattice.mat, return_all=FALSE)
 liouv.maxim <- function(data, family, interval, boundary = NULL, lattice.mat = NULL, return_all = FALSE, MC.approx = TRUE){
   family <-  match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
   stopifnot(!is.null(lattice.mat) || !is.null(boundary))
@@ -822,11 +826,13 @@ liouv.iTau = Vectorize(.liouv.iTau_s, "tau_hat")
 #'
 #' @return Inverse survival function values
 #' @examples
+#' \dontrun{
 #' u <- rliouv(n = 100, family = "frank", alphavec <- c(2,3), theta = 1)
 #' H_inv(u=u, family="frank", alphavec=c(2,3), theta=2)
 #' #Difference between true value and approximation (can be large depending on family)
 #' sum(abs(H_inv(u=u, family="frank", alphavec=c(2,3), theta=2)-
 #' isliouv_m(u=u, family="frank", alphavec=c(2,3), theta=2)))
+#' }
 H_inv <-  function(u, alphavec, family, theta, MC = 100000, TRUNC = FALSE){
   alphavec <- as.integer(alphavec)
   if(isTRUE(any(alphavec==0))){stop("Invalid parameters")}
@@ -1007,9 +1013,11 @@ express_coef_gumb <- function(index_k, index_l, theta, a){
 #' @param quant if the vector of probability is specified, the function will return the corresponding bootstrap quantiles
 #' @param silent boolean for output progress. Default is \code{FALSE}, which means iterations are printed if \eqn{d>2}.
 #' @examples
-#' theta.bci(B=99, family="gumbel", alphavec=c(2,3), n=1000, theta.hat=2)
-#' ## theta.bci(B=19, family="AMH", alphavec=c(1,2), n=100, theta.hat=0.5, quant=c(0.05,0.95))
-#' ## theta.bci(B=19, family="frank", alphavec=c(1,2,3), n=100, theta.hat=0.5, quant=c(0.05,0.95))
+#' \dontrun{
+#' theta.bci(B=99, family="gumbel", alphavec=c(2,3), n=100, theta.hat=2)
+#' theta.bci(B=19, family="AMH", alphavec=c(1,2), n=100, theta.hat=0.5, quant=c(0.05,0.95))
+#' theta.bci(B=19, family="frank", alphavec=c(1,2,3), n=100, theta.hat=0.5, quant=c(0.05,0.95))
+#' }
 #' @return a list with a 95% confidence inteval unless selected quantiles \code{quant} are supplied
 #' and the bootstrap values of Kendall's tau in \code{boot_tau} if \eqn{d=2} and the model is either \code{gumbel} or \code{clayton}.
 #' Otherwise, the list contains \code{boot_theta}.

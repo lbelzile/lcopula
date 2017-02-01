@@ -1,8 +1,8 @@
 Package: lcopula
 Type: Package
 Title: Liouville Copulas
-Version: 0.22
-Date: 2017-01-07
+Version: 1.0
+Date: 2017-01-23
 Authors@R: c(person("Leo", "Belzile", role = c("aut", "cre"),
                      email = "leo.belzile@epfl.ch"),
               person("Christian", " Genest", role = c("aut","ctb")),

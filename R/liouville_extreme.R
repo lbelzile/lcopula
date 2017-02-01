@@ -428,3 +428,13 @@ hbvevdliouv <- function(w, alpha, rho, CDA=c("C","S"), useR=F){
 
   return(r1(w, alpha, rho)+r2(w, alpha, rho)+r3(w, alpha, rho))
 }
+
+#Derivative of the Pickands dependence function at 1/2
+#Coefficient of asymmetry
+# Ap <- function(alpha, rho){
+#   c <- exp(lgamma(alpha+rho)-lgamma(alpha))
+#   pbeta(c[1]^(1/rho)/(c[1]^(1/rho)+c[2]^(1/rho)),alpha[1], alpha[2]+rho)-
+#     pbeta(c[2]^(1/rho)/(c[1]^(1/rho)+c[2]^(1/rho)),alpha[2], alpha[1]+rho)+
+#     (c[1]^(1/rho)/(c[1]^(1/rho)+c[2]^(1/rho)))^alpha[1]*(c[2]^(1/rho)/(c[1]^(1/rho)+c[2]^(1/rho)))^alpha[2]*
+#     2*((c[2]^(1/rho)/(c[1]^(1/rho)+c[2]^(1/rho)))^rho/beta(alpha[1], alpha[2]+rho)-(c[1]^(1/rho)/(c[1]^(1/rho)+c[2]^(1/rho)))^rho/beta(alpha[2], alpha[1]+rho))/rho
+# }

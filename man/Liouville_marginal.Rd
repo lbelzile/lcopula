@@ -38,6 +38,7 @@ Note: the arguments of \code{sliouv} are reversed since they are meant to be cal
 \eqn{psi} functions and their derivatives from the \code{\link[copula]{copula-package}}.
 }
 \examples{
+\dontrun{
 #Marginal density
 samp <- rliouv(n = 100, family = "clayton", alphavec <- c(2,3), theta = 2)
 dliouvm(x=samp[,1], family="clayton", alpha=2, theta=2)
@@ -48,5 +49,6 @@ pliouvm(x[,1], family="gumbel", alpha=alphavec[1], theta=2)
 su <- sliouvm(1-x[,1], family="gumbel", alpha=alphavec[1], theta=2)
 isliouvm(u=su, family="clayton", alpha=2, theta=2)
 #pliouv is the same as sliouv(isliouvm)
+}
 }
 

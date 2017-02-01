@@ -23,7 +23,7 @@ This function is a wrapper around \code{\link{isliouvm}}; it allows the user to 
 by applying different parameters to each margin.
 }
 \examples{
-u <- rliouv(n = 100, family = "clayton", alphavec <- c(2,3), theta = 2)
+u <- rliouv(n = 10, family = "clayton", alphavec <- c(2,3), theta = 2)
 isliouv_m(u=u, family="clayton", alphavec=c(2,3), theta=2)
 }
 

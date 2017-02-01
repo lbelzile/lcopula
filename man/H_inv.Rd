@@ -26,11 +26,13 @@ Inverse survival function values
 The function is used internally for optimization.
 }
 \examples{
+\dontrun{
 u <- rliouv(n = 100, family = "frank", alphavec <- c(2,3), theta = 1)
 H_inv(u=u, family="frank", alphavec=c(2,3), theta=2)
 #Difference between true value and approximation (can be large depending on family)
 sum(abs(H_inv(u=u, family="frank", alphavec=c(2,3), theta=2)-
 isliouv_m(u=u, family="frank", alphavec=c(2,3), theta=2)))
+}
 }
 \keyword{internal}
 

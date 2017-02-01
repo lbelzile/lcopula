@@ -40,10 +40,10 @@ Returns the maximum for \code{alphavec} and \code{theta}.
  liouv.maxim(data=data, family="j", interval=c(1.25,3), boundary=c(2,2),return_all=TRUE)
  lattice.mat <- t(combn(1:3,2))
  liouv.maxim(data=data, family="j", interval=c(1.25,3), lattice.mat=lattice.mat, return_all=FALSE)
+ #data <- rliouv(n=1000, family="gumbel", alphavec=c(1,2), theta=2)
+ liouv.maxim.mm(data=data, family="gumbel", boundary=c(3,3),return_all=TRUE)
+ lattice.mat <- t(combn(1:3,2))
+ liouv.maxim.mm(data=data, family="gumbel", lattice.mat=lattice.mat, return_all=FALSE)
 }
-data <- rliouv(n=1000, family="gumbel", alphavec=c(1,2), theta=2)
-liouv.maxim.mm(data=data, family="gumbel", boundary=c(3,3),return_all=TRUE)
-lattice.mat <- t(combn(1:3,2))
-liouv.maxim.mm(data=data, family="gumbel", lattice.mat=lattice.mat, return_all=FALSE)
 }
 

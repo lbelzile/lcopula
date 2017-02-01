@@ -49,12 +49,14 @@ survival function \code{\link{isliouvm}} of the Liouville vector, and then evalu
 distribution at the resulting Liouville vector.
 }
 \examples{
+\dontrun{
 #Multivariate density of Clayton Liouville copula
 x <- rliouv(n = 100, family = "clayton", alphavec <- c(2,3), theta = 2)
 dliouv(x=x, family="clayton", alphavec=c(2,3), theta=2, TRUE)
 #Distribution function, multivariate sample
 x <- rliouv(n=100, family="frank", theta=1.5, alphavec=c(2,3))
 pliouv(theta=1.5, x=x,family="frank", alphavec=c(2,3))
+}
 }
 \references{
 McNeil A.J. and Neslehova, J.G. (2010) From Archimedean to Liouville Copulas. \emph{J. Multivar. Anal.}, \strong{101}(8): 1772--1790.
