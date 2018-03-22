@@ -23,4 +23,3 @@ The function computes Kendall's \eqn{\tau}{tau} for the given model, given \code
 liouv.Tau(theta=2, family="gumbel", alphavec=c(1,2))
 liouv.Tau(theta=1, family="clayton", alphavec=c(2,1))
 }
-

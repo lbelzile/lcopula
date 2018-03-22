@@ -88,7 +88,7 @@
 #' @export
 pickands.liouv<-function(t, rho=0.5, alpha=c(1,1),CDA=c("C","S")){
   #Check conditions
-  if(missing(CDA)==T){
+  if(missing(CDA)==TRUE){
     CDA="C"
     warning("Setting default to Liouville CDA. Use CDA=`S` for the Dirichlet model")
   }
@@ -143,7 +143,7 @@ pickands.liouv<-function(t, rho=0.5, alpha=c(1,1),CDA=c("C","S")){
 #' pickands.plot(rho=0.8, alpha=c(1.2,0.1), col="red", CDA="S", plot.new=FALSE)
 pickands.plot<-function(rho, alpha, plot.new=T,CDA=c("C","S"), tikz=F, ...){
   #Check conditions
-  if(missing(CDA)==T){
+  if(missing(CDA)==TRUE){
     CDA="C"
     warning("Setting default to Liouville CDA. Use CDA=`S` for the Dirichlet model")
   }
@@ -151,7 +151,7 @@ pickands.plot<-function(rho, alpha, plot.new=T,CDA=c("C","S"), tikz=F, ...){
   if(length(alpha)!=2){
     stop("Not implemented beyond bivariate case")
   }
-  if(plot.new==T){
+  if(plot.new==TRUE){
     plot.new()
     plot.window(c(0,1), c(0.5,1))
     axis(side=2, at=seq(0.5,1,by=0.1), pos=0,las=2,tck=0.01)
@@ -161,7 +161,7 @@ pickands.plot<-function(rho, alpha, plot.new=T,CDA=c("C","S"), tikz=F, ...){
     lines(c(0,0.5),c(1,0.5),lty=3,col="gray")
     lines(c(0.5,1),c(0.5,1),lty=3,col="gray")
     lines(c(0,1),c(1,1),lty=3,col="gray")
-    if(tikz==T){
+    if(tikz==TRUE){
       mtext("$t$", side=1, line=2)
       mtext("$\\mathrm{A}(t)$", side=2, line=2)
     } else{
@@ -273,168 +273,62 @@ K.plot <- function(data, add=F, ...){
   }
 }
 
-#' Bivariate spectral density of the CDA of survival copula and copula of Liouville vectors
+#' Spectral density of the CDA of survival copula and copula of Liouville vectors
 #'
 #' Computes the Liouville EV model or the scaled Dirichlet EV model spectral density
 #'
-#' @param w vector of points at which to evaluate. Must be in the unit interval
-#' @param alpha vector of Dirichlet allocations (must be a vector of integers if \code{CDA="C"}), otherwise strictly positive.
-#' @param rho parameter of limiting model corresponding to index of regular variation, between \eqn{(0,1)}
-#' @param CDA copula domain of attraction of either Liouville copula, \code{C}, or its survival copula \code{S}
-#' @param useR whether to use the R code for the spectral density of \code{C}. Default to \code{F}. Implemented for compatibility reason.
-#'
-#' @return a vector of the same length as \code{w}.
+#' @param w matrix of points in the unit simplex at which to evaluate the density
+#' @param alpha vector of Dirichlet allocations (strictly positive).
+#' @param rho parameter of limiting model corresponding to index of regular variation
+#' @param CDA copula domain of attraction of either the Liouville copula, \code{C}, or its survival copula \code{S}
+#' @param logdensity logical; whether to return the log density or not
+#' @return a vector with the same number of rows as \code{w}.
 #' @export
 #' @examples
-#' hbvevdliouv(seq(0.01,0.99,by=0.01), alpha=c(1,2), rho=0.2, CDA="C")
-#' hbvevdliouv(seq(0.01,0.99,by=0.01), alpha=c(0.1,2), rho=0.2, CDA="S")
-#' hbvevdliouv(seq(0.01,0.99,by=0.01), alpha=c(1,2), rho=0.2, CDA="S", useR=TRUE)
-hbvevdliouv <- function(w, alpha, rho, CDA=c("C","S"), useR=F){
-  if(length(alpha)>2){stop("Currently only implemented in the bivariate case")}
+#' hmvevdliouv(seq(0.01,0.99,by=0.01), alpha=c(1,2), rho=0.2, CDA="C")
+#' hmvevdliouv(seq(0.01,0.99,by=0.01), alpha=c(0.1,2), rho=0.2, CDA="S")
+#' hmvevdliouv(seq(0.01,0.99,by=0.01), alpha=c(1,2), rho=0.2, CDA="S")
+hmvevdliouv <- function(w, alpha, rho, CDA=c("C","S"), logdensity=FALSE){
   if(any(w<0) || any(w>1)){
-    stop("w must be a vector whose elements are between 0 and 1")
+    stop("w must contain elements between 0 and 1")
+  }
+  w <- as.matrix(w)
+  if(ncol(w)!=length(alpha)){
+    w <- cbind(w, 1-rowSums(w))
+  } else{
+    if(rowSums(w)!=rep(1, nrow(w))){
+    stop("Components must sum to 1")
+    }
   }
   if(length(rho)>1){
-    rho=rho[1]
+    rho <- rho[1]
     warning("Using only first coordinate of rho")
   }
-  if(any(rho<=0)){
-    stop("rho must be positive")
+  if(rho<=0){
+    CDA <- "C"
+    rho <- -rho
   }
-  if(CDA=="C" && (any(rho>=1) || any(rho<=0))){
-    stop("rho must be between (0,1)")
+  if(CDA=="C" && rho> min(alpha)){
+    stop("`abs(rho)` must be smaller than `min(alpha)`")
   }
   if(any(alpha<=0)){
     stop("alpha must be positive")
   }
   if(missing(CDA)){
-    warning("Invalid input for argument `CDA`. Defaulting to `C`")
+    warning("Invalid input for argument `CDA`. Defaulting to `C`, the `negdir` family")
     CDA = "C"
   }
   if(!(CDA %in% c("C","S"))){
     stop("Invalid input for argument `CDA`")
   }
-  if(CDA=="C" && sum(alpha-round(alpha))>0){
-    stop("alpha must be a vector of integers")
-  }
-  if(CDA == "C" && useR==F){
-    h <-.spectraldensity(w,alphavec=alpha, rho=rho)
-    #Handle endpoints
-    nulls <- which(is.nan(h)==T)
-    if(length(nulls)>0){
-      h[nulls] = 0
-    }
+  
+  h <- apply(w, 1, function(wrow){ switch(CDA, 
+    C=negdirspecdens(dat=t(as.matrix(wrow)), param=c(alpha, rho), d=length(alpha), transform=FALSE),
+    S=dirspecdens(dat=t(as.matrix(wrow)),param=c(alpha, rho), d=length(alpha), transform=FALSE)
+   )})
+  if(logdensity){
     return(h)
-  } else if(CDA == "C" && useR==T){
-    .spectral_dens_R(w, alpha, rho)
-  } else if(CDA == "S"){
-    .dir_density(w, alpha, rho)
+  } else{
+    return(exp(h))
   }
 }
-
-.diri_density<-function(w, alpha, rho){
-  a1=alpha[1]
-  a2=alpha[2]
-  if(w!=0 && w!=1){
-    a=lbeta(alpha[1]+rho, alpha[2])+log(w);
-    b=lbeta(alpha[2]+rho, alpha[1])+log(1-w);
-    return(0.5*exp((a1/rho)*a+(a2/rho)*b-log(rho)-log(w)-log(1-w)-(a1+a2+rho)*log(exp((1/rho)*a)+exp((1/rho)*b))))
-  }
-  return(0)
-}
-
-.dir_density<-Vectorize(.diri_density, "w")
-
-
-.spectral_dens_R<-function(w, alpha, rho){
-
-  r1R<-function(w, alpha, rho){
-    a0=log(.dens_const(alpha[1], rho))+log(w)
-    b0=log(.dens_const(alpha[2], rho))+log(1-w)
-
-    return(-0.5*exp(rho*log(exp(-(1/rho)*a0)+exp(-(1/rho)*b0))-2*log(rho)-log(w)-log(1-w))*(
-      sum(if(alpha[1]>1){
-        sapply(1:(alpha[1]-1), function(i){
-          exp(log(.b(i,rho))-lgamma(i)+(1/rho)*a0+(i/rho)*b0-(i+2)*
-                log(exp((1/rho)*a0)+exp((1/rho)*b0)))*(i*exp((1/rho)*a0)-exp((1/rho)*b0))
-        })
-      })
-      + sum(if(alpha[2]>1){
-        sapply(1:(alpha[2]-1), function(j){
-          exp(log(.b(j,rho))-lgamma(j)+(j/rho)*a0+(1/rho)*b0-(j+2)*
-                log(exp((1/rho)*a0)+exp((1/rho)*b0)))*(j*exp((1/rho)*b0)-exp((1/rho)*a0))
-        })
-      })
-      + sum(if(alpha[1]>1 && alpha[2]>1){
-        sapply(1:(alpha[1]-1), function(i){
-          sapply(1:(alpha[2]-1), function(j){
-            exp(log(.b(i+j,rho))-lgamma(i+1)-lgamma(j+1)+(j/rho)*a0+(i/rho)*b0-(i+j+2)*
-                  log(exp((1/rho)*a0)+exp((1/rho)*b0)))*
-              (-(i+2*i*j+j)*exp((1/rho)*(a0+b0))+i^2*exp((2/rho)*a0)+j^2*exp((2/rho)*b0))
-          })
-        })
-      })
-    ))
-  }
-  r1<-Vectorize(r1R, "w")
-
-  r2R<-function(w, alpha, rho){
-    a0=log(.dens_const(alpha[1], rho))+log(w)
-    b0=log(.dens_const(alpha[2], rho))+log(1-w)
-
-    return(exp(-log(2)-log(rho)+(rho-1)*log(exp(-(1/rho)*a0)+exp(-(1/rho)*b0)))*(
-      exp(-(1/rho)*b0-log(1-w)-log(w))-exp(-(1/rho)*a0-log(1-w)-log(w)))*(
-        sum(if(alpha[1]>1){
-          sapply(1:(alpha[1]-1), function(i){
-            exp(log(.b(i,rho))-lgamma(i)+(1/rho)*a0+(i/rho)*b0-(i+1)*
-                  log(exp((1/rho)*a0)+exp((1/rho)*b0)))
-          })
-        })
-        - sum(if(alpha[2]>1){
-          sapply(1:(alpha[2]-1), function(j){
-            exp(log(.b(j,rho))-lgamma(j)+(j/rho)*a0+(1/rho)*b0-(j+1)*
-                  log(exp((1/rho)*a0)+exp((1/rho)*b0)))
-          })
-        })
-        + sum(if(alpha[1]>1 && alpha[2]>1){
-          sapply(1:(alpha[1]-1), function(i){
-            sapply(1:(alpha[2]-1), function(j){
-              exp(log(.b(i+j,rho))-lgamma(i+1)-lgamma(j+1)+(j/rho)*a0+(i/rho)*b0-(i+j+1)*
-                    log(exp((1/rho)*a0)+exp((1/rho)*b0)))*
-                (i*exp((1/rho)*a0)-j*exp((1/rho)*b0))
-            })
-          })
-        })
-      ))
-  }
-  r2<-Vectorize(r2R, "w")
-
-
-
-  r3R<-function(w, alpha, rho){
-    a0=log(.dens_const(alpha[1], rho))+log(w)
-    b0=log(.dens_const(alpha[2], rho))+log(1-w)
-
-    return(0.5*((1-rho)/rho)*exp((rho-2)*log(exp(-(1/rho)*a0)+
-                                               exp(-(1/rho)*b0))-(1/rho)*(a0+b0)-log(w)-log(1-w))*(
-                                                 1- sum(sapply(0:(alpha[1]-1), function(i){
-                                                   sapply(0:(alpha[2]-1), function(j){
-                                                     exp(log(.b(i+j,rho))-lgamma(i+1)-lgamma(j+1)+(j/rho)*a0+(i/rho)*b0-(i+j)*
-                                                           log(exp((1/rho)*a0)+exp((1/rho)*b0)))          })
-                                                 }))
-                                               ))
-  }
-  r3<-Vectorize(r3R, "w")
-
-  return(r1(w, alpha, rho)+r2(w, alpha, rho)+r3(w, alpha, rho))
-}
-
-#Derivative of the Pickands dependence function at 1/2
-#Coefficient of asymmetry
-# Ap <- function(alpha, rho){
-#   c <- exp(lgamma(alpha+rho)-lgamma(alpha))
-#   pbeta(c[1]^(1/rho)/(c[1]^(1/rho)+c[2]^(1/rho)),alpha[1], alpha[2]+rho)-
-#     pbeta(c[2]^(1/rho)/(c[1]^(1/rho)+c[2]^(1/rho)),alpha[2], alpha[1]+rho)+
-#     (c[1]^(1/rho)/(c[1]^(1/rho)+c[2]^(1/rho)))^alpha[1]*(c[2]^(1/rho)/(c[1]^(1/rho)+c[2]^(1/rho)))^alpha[2]*
-#     2*((c[2]^(1/rho)/(c[1]^(1/rho)+c[2]^(1/rho)))^rho/beta(alpha[1], alpha[2]+rho)-(c[1]^(1/rho)/(c[1]^(1/rho)+c[2]^(1/rho)))^rho/beta(alpha[2], alpha[1]+rho))/rho
-# }

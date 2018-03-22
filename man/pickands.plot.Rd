@@ -36,4 +36,3 @@ pickands.plot(rho=0.9, alpha=c(1,1), CDA="S")
 pickands.plot(rho=0.9, alpha=c(0.2,0.5), col="darkred", CDA="S", plot.new=FALSE)
 pickands.plot(rho=0.8, alpha=c(1.2,0.1), col="red", CDA="S", plot.new=FALSE)
 }
-

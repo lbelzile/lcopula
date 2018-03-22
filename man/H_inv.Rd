@@ -35,4 +35,3 @@ isliouv_m(u=u, family="frank", alphavec=c(2,3), theta=2)))
 }
 }
 \keyword{internal}
-

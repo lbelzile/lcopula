@@ -28,4 +28,3 @@ of the survival copula, the scaled Dirichlet extreme value model, or the CDA of 
 pickands.liouv(seq(0,1,by=0.01),1,c(0.1,0.3),CDA="S")
 pickands.liouv(t = seq(0,1,by=0.01), rho = 0.5, alpha = c(1,3), CDA="C")
 }
-

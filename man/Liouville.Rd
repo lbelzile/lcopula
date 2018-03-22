@@ -2,9 +2,11 @@
 % Please edit documentation in R/liouville.R
 \name{Liouville}
 \alias{Liouville}
+\alias{rliouv}
+\alias{pliouv}
 \alias{dliouv}
 \alias{pliouv}
-\alias{rliouv}
+\alias{dliouv}
 \title{Liouville copulas}
 \usage{
 rliouv(n = 100, family, alphavec, theta, reverse = FALSE)
@@ -64,4 +66,3 @@ McNeil A.J. and Neslehova, J.G. (2010) From Archimedean to Liouville Copulas. \e
 \seealso{
 \code{\link{Liouville_marginal}}
 }
-

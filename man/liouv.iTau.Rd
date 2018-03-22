@@ -23,4 +23,3 @@ The moment estimates are based on inversion of the formula Kendall's tau for Cla
 liouv.iTau(0.5,family="gumbel", c(1,2))
 liouv.iTau(0.5,family="clayton", c(3,2))
 }
-

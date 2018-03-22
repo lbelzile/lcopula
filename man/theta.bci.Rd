@@ -45,4 +45,3 @@ theta.bci(B=19, family="AMH", alphavec=c(1,2), n=100, theta.hat=0.5, quant=c(0.0
 theta.bci(B=19, family="frank", alphavec=c(1,2,3), n=100, theta.hat=0.5, quant=c(0.05,0.95))
 }
 }
-

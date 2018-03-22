@@ -22,4 +22,3 @@ Clayton coefficient
 The function is used internally in \cite{liouv.Tau}.
 }
 \keyword{internal}
-

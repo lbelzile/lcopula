@@ -26,4 +26,3 @@ by applying different parameters to each margin.
 u <- rliouv(n = 10, family = "clayton", alphavec <- c(2,3), theta = 2)
 isliouv_m(u=u, family="clayton", alphavec=c(2,3), theta=2)
 }
-

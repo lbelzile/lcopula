@@ -46,4 +46,3 @@ Returns the maximum for \code{alphavec} and \code{theta}.
  liouv.maxim.mm(data=data, family="gumbel", lattice.mat=lattice.mat, return_all=FALSE)
 }
 }
-

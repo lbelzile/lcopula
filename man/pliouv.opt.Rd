@@ -23,4 +23,3 @@ value of marginal density
 \description{
 The function is used internally for optimization.
 }
-

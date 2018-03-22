@@ -38,10 +38,9 @@ K.plot(rCopula(n=1000,claytonCopula(param=iTau(claytonCopula(0.3),0.5),dim=2)),a
 #Perfect positive dependence
 K.plot(rCopula(n=1000,claytonCopula(param=iTau(claytonCopula(0.3),1),dim=2)),add=TRUE,col=4)
 }
-\author{
-Pr. Christian Genest (the code was adapted for the multivariate case)
-}
 \references{
 Genest & Boies (2003). Detecting Dependence with Kendall Plots, \emph{The American Statistician}, \bold{57}(4), 275--284.
 }
-
+\author{
+Pr. Christian Genest (the code was adapted for the multivariate case)
+}

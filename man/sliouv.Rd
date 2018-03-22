@@ -19,4 +19,3 @@ sliouv(theta, x, family, alphavec)
 \code{sliouv} returns the survival function of a Liouville vector. For the survival copula
 and the associated probability, see \code{\link{pliouv}}.
 }
-

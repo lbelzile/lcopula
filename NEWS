@@ -1,6 +1,8 @@
-lcopula v0.3,  		2017-01-23
+
+lcopula v0.3  		2017-01-23, 2017-03-05
 ############################
 *New code for extremal attractors, now supported for non-integer valued cases
+Registration of native routines
 
 lcopula v0.206,  	2016-07-06
 ############################
