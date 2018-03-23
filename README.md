@@ -1,4 +1,8 @@
 # lcopula
+
+[![Travis-CI Build Status](https://travis-ci.org/lbelzile/lcopula.svg?branch=master)](https://travis-ci.org/lbelzile/lcopula) 
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/lcopula)](https://cran.r-project.org/package=lcopula)
+
 ## Liouville copulas
 
 Various functions to estimate one of five Liouville copula families as defined in the `copula` package. 
