@@ -4,13 +4,14 @@ Title: Liouville Copulas
 Version: 1.0.1
 Date: 2017-03-05
 Authors@R: c(person("Leo", "Belzile", role = c("aut", "cre"),
-                     email = "leo.belzile@epfl.ch"),
+                     email = "belzilel@gmail.com),
               person("Christian", " Genest", role = c("aut","ctb")),
               person("Alexander", "J. McNeil", role = c("ctb")),
               person("Johanna", "G. Neslehova", role = c("ctb")))
 Description: Collections of functions allowing random number generations and
     estimation of 'Liouville' copulas.
 License: GPL-3
+BugReports: https://github.com/lbelzile/lcopula/issues
 Imports:
     Rcpp (>= 0.11.4),
     pcaPP,
