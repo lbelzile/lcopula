@@ -1,13 +1,13 @@
 Package: lcopula
 Type: Package
 Title: Liouville Copulas
-Version: 1.0.1
-Date: 2017-03-05
+Version: 1.0.2
+Date: 2018-06-08
 Authors@R: c(person("Leo", "Belzile", role = c("aut", "cre"),
-                     email = "belzilel@gmail.com),
+                     email = "belzilel@gmail.com"),
               person("Christian", " Genest", role = c("aut","ctb")),
-              person("Alexander", "J. McNeil", role = c("ctb")),
-              person("Johanna", "G. Neslehova", role = c("ctb")))
+              person("Alexander", "J. McNeil", role = "ctb"),
+              person("Johanna", "G. Neslehova", role = "ctb"))
 Description: Collections of functions allowing random number generations and
     estimation of 'Liouville' copulas.
 License: GPL-3
