@@ -6,9 +6,6 @@
 \alias{pliouvm}
 \alias{dliouvm}
 \alias{isliouvm}
-\alias{pliouvm}
-\alias{isliouvm}
-\alias{dliouvm}
 \title{Liouville vectors marginal functions}
 \usage{
 sliouvm(x, family, alpha, theta)

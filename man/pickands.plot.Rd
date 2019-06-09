@@ -4,7 +4,8 @@
 \alias{pickands.plot}
 \title{Plot Pickands dependence function for CDA of Liouville copulas}
 \usage{
-pickands.plot(rho, alpha, plot.new = T, CDA = c("C", "S"), tikz = F, ...)
+pickands.plot(rho, alpha, plot.new = T, CDA = c("C", "S"), tikz = F,
+  ...)
 }
 \arguments{
 \item{rho}{index of regular variation parameter}

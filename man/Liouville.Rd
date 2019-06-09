@@ -5,8 +5,6 @@
 \alias{rliouv}
 \alias{pliouv}
 \alias{dliouv}
-\alias{pliouv}
-\alias{dliouv}
 \title{Liouville copulas}
 \usage{
 rliouv(n = 100, family, alphavec, theta, reverse = FALSE)
@@ -36,8 +34,6 @@ either a matrix of dimension \code{n} by \code{length(alphavec)}  with the corre
 \description{
 Multivariate density, survival copula
 and random generation for the Liouville copulas.
-
-\bold{Liouville copula function}
 }
 \details{
 \code{rliouv} generates draws from the Liouville copula. \code{dliouv} evaluates the density of an \code{n} by \code{d} matrix of observations. \code{pliouv} is the (survival) copula associated with the Liouville vector and is as such the multivariate distribution function for uniform observations.
