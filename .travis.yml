@@ -2,5 +2,5 @@
 
 language: R
 before_install:
-- sudo apt-get install libgsl-dev libgsl2
+- sudo apt-get install libgsl-dev libgslcblas0
 cache: packages
