@@ -3,13 +3,12 @@ Type: Package
 Title: Liouville Copulas
 Version: 1.0.3
 Date: 2019-06-09
-Authors@R: c(person("Leo", "Belzile", role = c("aut", "cre"),
-                     email = "belzilel@gmail.com"),
+Authors@R: c(person("Leo", "Belzile", role = c("aut", "cre"), email = "belzilel@gmail.com", comment = c(ORCID = "0000-0002-9135-014X")),
               person("Christian", " Genest", role = c("aut","ctb")),
               person("Alexander", "J. McNeil", role = "ctb"),
               person("Johanna", "G. Neslehova", role = "ctb"))
 Description: Collections of functions allowing random number generations and
-    estimation of 'Liouville' copulas.
+    estimation of 'Liouville' copulas, as described in Belzile and Neslehova (2017) <doi:10.1016/j.jmva.2017.05.008>.
 License: GPL-3
 BugReports: https://github.com/lbelzile/lcopula/issues
 Imports:
