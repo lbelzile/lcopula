@@ -54,7 +54,7 @@ NumericVector dirspecdens(NumericVector param, NumericMatrix dat, int d, bool tr
 
     dens[0] = dens[0] -(rho[0]+alpha[0])*log(proddens[0]);
   }
-  dens[0] = dens[0]+dat.nrow()*(lgamma(alpha[0]+rho[0])-(d-1)*log(rho[0])-sum(lgamma(alphavec))-log(d));
+  dens[0] = dens[0]+dat.nrow()*(lgamma(alpha[0]+rho[0])-(d-1)*log(rho[0])-sum(lgamma(alphavec))-log(static_cast<double>(d)));
 
   return dens;
 }
@@ -114,7 +114,7 @@ NumericVector negdirspecdens(NumericVector param, NumericMatrix dat, int d, bool
 
     dens[0] = dens[0] -(alpha[0]-rho[0])*log(proddens[0]);
   }
-  dens[0] = dens[0]+dat.nrow()*(lgamma(alpha[0]-rho[0])-(d-1)*log(rho[0])-sum(lgamma(alphavec))-log(d));
+  dens[0] = dens[0]+dat.nrow()*(lgamma(alpha[0]-rho[0])-(d-1)*log(rho[0])-sum(lgamma(alphavec))-log(static_cast<double>(d)));
 
   return dens;
 }
@@ -147,7 +147,7 @@ NumericVector ctspecdens(NumericVector param, NumericMatrix dat, bool transform 
   }
   double alpha = sum(alphavec);
   NumericVector c = alphavec/alpha;
-  NumericVector Constant = NumericVector::create(lgamma(alpha)-sum(lgamma(alphavec))-log(d));
+  NumericVector Constant = NumericVector::create(lgamma(alpha)-sum(lgamma(alphavec))-log(static_cast<double>(d)));
   for(int j=0; j< dat.nrow(); j++){
     proddens[0] = 0.0;
     for(int k=0; k<d; k++){
