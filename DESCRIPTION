@@ -1,8 +1,8 @@
 Package: lcopula
 Type: Package
 Title: Liouville Copulas
-Version: 1.0.3
-Date: 2019-06-09
+Version: 1.0.4
+Date: 2019-07-06
 Authors@R: c(person("Leo", "Belzile", role = c("aut", "cre"), email = "belzilel@gmail.com", comment = c(ORCID = "0000-0002-9135-014X")),
               person("Christian", " Genest", role = c("aut","ctb")),
               person("Alexander", "J. McNeil", role = "ctb"),
@@ -23,3 +23,4 @@ Depends:
 LinkingTo: Rcpp
 RoxygenNote: 6.1.1
 Encoding: UTF-8
+LazyData: true

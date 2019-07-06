@@ -1,4 +1,8 @@
 
+lcopula v0.4  		2018-07-06
+############################
+*Fix overloading ambiguity for Solaris
+
 lcopula v0.3  		2018-06-09
 ############################
 *New code for extremal attractors, now supported for non-integer valued cases
