@@ -1,6 +1,0 @@
-# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
-
-language: R
-before_install:
-- sudo apt-get install libgsl-dev libgslcblas0
-cache: packages
