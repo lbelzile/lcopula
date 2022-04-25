@@ -4,8 +4,15 @@
 \alias{theta.bci}
 \title{Parametric bootstrap confidence interval for the parameter \code{theta} for Liouville copula}
 \usage{
-theta.bci(B = 1999, family, alphavec, n, theta.hat, quant = c(0.025,
-  0.975), silent = FALSE)
+theta.bci(
+  B = 1999,
+  family,
+  alphavec,
+  n,
+  theta.hat,
+  quant = c(0.025, 0.975),
+  silent = FALSE
+)
 }
 \arguments{
 \item{B}{number of bootstrap replicates}
@@ -34,6 +41,8 @@ Kendall's \eqn{\tau}{tau} is calculated from the sample, and the confidence inte
 to the inverse \eqn{\tau^{-1}(\tau(\theta))}{tau} for the bootstrap quantile values of \eqn{\tau}{tau} (using monotonicity).
 }
 \details{
+Install package \code{wdm} to speed up calculation of Kendall's tau.
+
 Since no closed-form formulas exist for the other models or in higher dimension,
 the method is extremely slow since it relies on maximization
 of a new sample from the model and look up the corresponding parameters.

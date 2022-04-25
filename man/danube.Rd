@@ -4,11 +4,13 @@
 \name{danube}
 \alias{danube}
 \title{Ranks of preprocessed monthly Danube river flow measurements}
-\format{This data frame contains the following columns:
+\format{
+This data frame contains the following columns:
 \itemize{
      \item{inn}{A numeric vector containing the rank of prewhitened level observations of the Inn river at Nagyramos.}
      \item{donau}{A numeric vector containing the rank of prewhitened level observations of the Donau river at Scharding.}
-}}
+}
+}
 \source{
 Vorosmarty, C.J., Fekete, B.M., Tucker, B.A. (1998).   Global River Discharge, 1807--1991, V. 1.1(RivDIS). Data set.   Available from \code{http://doi.org/10.3334/ORNLDAAC/199}
 }

@@ -5,8 +5,15 @@
 \alias{liouv.maxim.mm}
 \title{Maximization of  Liouville copula likelihood function}
 \usage{
-liouv.maxim(data, family, interval, boundary = NULL,
-  lattice.mat = NULL, return_all = FALSE, MC.approx = TRUE)
+liouv.maxim(
+  data,
+  family,
+  interval,
+  boundary = NULL,
+  lattice.mat = NULL,
+  return_all = FALSE,
+  MC.approx = TRUE
+)
 }
 \arguments{
 \item{data}{sample matrix from a Liouville copula}

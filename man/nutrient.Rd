@@ -4,7 +4,8 @@
 \name{nutrient}
 \alias{nutrient}
 \title{Women daily nutrient intake}
-\format{This data frame contains the following columns:
+\format{
+This data frame contains the following columns:
 \describe{
  \item{id}{A numeric vector containing the identification of the participant.}
  \item{calcium}{A numeric vector containing measured calcium.}
@@ -12,7 +13,8 @@
  \item{protein}{A numeric vector containing protein measurements.}
  \item{vitamin.a}{A numeric vector containing vitamin A measurements.}
  \item{vitamin.c}{A numeric vector containing vitamin C measurements.}
-   }}
+   }
+}
 \source{
 The survey data was processed by Dr. Andrew Wiesner for a course on multivariate statistics at The Pennsylvania State University.
 }

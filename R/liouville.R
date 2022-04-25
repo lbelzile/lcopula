@@ -1,4 +1,4 @@
-##  Copyright (C) 2015-2016 Leo Belzile
+##  Copyright (C) 2015-2022 Leo Belzile
 ##
 ##  This file is part of the "lcopula" package for R.  This program
 ##  is free software; you can redistribute it and/or modify it under the
@@ -44,10 +44,9 @@
 #' @useDynLib lcopula
 #' @exportPattern "^[[:alpha:]]+"
 #' @importFrom graphics "axis" "lines" "mtext" "plot.window" "points"
-#' @importFrom stats "integrate" "optimise" "pbeta" "quantile" "rgamma" "runif" "uniroot"
+#' @importFrom stats "integrate" "optimise" "pbeta" "quantile" "rgamma" "runif" "uniroot" "cor"
 #' @import copula
 #' @importFrom utils combn
-#' @importFrom pcaPP cor.fk
 #' @importFrom Rcpp evalCpp
 NULL
 
@@ -680,8 +679,20 @@ liouv.maxim.mm <- function(data, family, boundary = NULL, lattice.mat = NULL, re
     }
     lattice.mat <- matrix(unlist(expand.grid(term)),ncol=length(boundary))
   }
-  if(!is.null(lattice.mat)){stopifnot(ncol(lattice.mat) == ncol(data), ncol(data) == 2) }
-  tau_hat <- cor.fk(data)[1, 2]
+  if(!is.null(lattice.mat)){
+    stopifnot(ncol(lattice.mat) == ncol(data), ncol(data) == 2) 
+  }
+  if (!requireNamespace("wdm", quietly = TRUE)) {
+    # warning("Install package \"wdm\" to speed up calculations.",
+    #      call. = FALSE)
+    tau_hat <- cor(x = data[,1],
+                   y = data[,2],
+                   method = "kendall")
+  } else{
+  tau_hat <- wdm::wdm(x = data[,1], 
+                      y = data[,2], 
+                      method = "kendall")
+  }
   #Create containers for values
   like_array  <- array(dim=apply(lattice.mat,2,max))
   theta_array <- array(dim=apply(lattice.mat,2,max))
@@ -952,13 +963,17 @@ switch(Meth, sort = {
     if (log) k * log(alpha) + log(pol) else alpha^k * pol
 }, direct = {
     s <-  Stirling1.all(d)
-    k <-  1:d
+    k <-  seq_len(d)
     S <-  lapply(k, Stirling2.all)
     vapply(k, function(k.) {
         j <-  k.:d
         S. <-  vapply(j, function(i) S[[i]][k.], 1)
         sm <-  sum(alpha^j * s[j] * S.)
-        if (log) log(abs(sm)) else (-1)^(d - k.) * sm
+        if (log){
+          log(abs(sm)) 
+    } else {
+      (-1)^(d - k.) * sm
+    }
     }, NA_real_)
 }, stop(gettextf("unsupported method '%s' in coeffG", method),
     domain = NA))
@@ -980,7 +995,7 @@ switch(Meth, sort = {
 express_coef_gumb <- function(index_k, index_l, theta, a){
   if(index_l == 0){
     d1 <- .coeffG(d = index_k, alpha = 1/theta, method = "direct", log = TRUE)
-    intern <- seq(1:index_k)
+    intern <- seq_len(index_k)
     d2 <- lgamma(intern)-intern*log(2)
     return(theta*sum(exp(d1+d2))/gamma(a))
   }  else{
@@ -1000,6 +1015,8 @@ express_coef_gumb <- function(index_k, index_l, theta, a){
 #' Liouvilla copula model. If \eqn{d=2} and the model is either \code{gumbel} or \code{clayton}, the value of
 #' Kendall's \eqn{\tau}{tau} is calculated from the sample, and the confidence interval or the quantiles correspond
 #' to the inverse \eqn{\tau^{-1}(\tau(\theta))}{tau} for the bootstrap quantile values of \eqn{\tau}{tau} (using monotonicity).
+#' 
+#' Install package \code{wdm} to speed up calculation of Kendall's tau.
 #'
 #' Since no closed-form formulas exist for the other models or in higher dimension,
 #' the method is extremely slow since it relies on maximization
@@ -1022,31 +1039,62 @@ express_coef_gumb <- function(index_k, index_l, theta, a){
 #' and the bootstrap values of Kendall's tau in \code{boot_tau} if \eqn{d=2} and the model is either \code{gumbel} or \code{clayton}.
 #' Otherwise, the list contains \code{boot_theta}.
 #' @export
-theta.bci <- function(B = 1999, family, alphavec, n, theta.hat, quant = c(0.025,0.975), silent=FALSE){
-  family <-  match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
+theta.bci <- function(B = 1999, 
+                      family, 
+                      alphavec, 
+                      n, 
+                      theta.hat, 
+                      quant = c(0.025,0.975), 
+                      silent = FALSE){
+  family <-  match.arg(arg = family, 
+                       several.ok = FALSE,
+                       choices = c("clayton",
+                                   "gumbel", 
+                                   "frank", 
+                                   "AMH", 
+                                   "joe"))
   alphavec <- as.integer(alphavec)
-  if(isTRUE(any(alphavec==0))){stop("Invalid parameters")}
-  illegalpar <-  switch(family,
-                       clayton = copClayton@paraConstr(theta.hat),
-                       gumbel = copGumbel@paraConstr(theta.hat),
-                       frank = copFrank@paraConstr(theta.hat),
-                       AMH = copAMH@paraConstr(theta.hat),
-                       joe = copJoe@paraConstr(theta.hat))
-  if(!illegalpar)
+  if(isTRUE(any(alphavec==0))){
+    stop("Invalid parameters")
+    }
+  illegalpar <-  
+    switch(family,
+           clayton = copClayton@paraConstr(theta.hat),
+           gumbel = copGumbel@paraConstr(theta.hat),
+           frank = copFrank@paraConstr(theta.hat),
+           AMH = copAMH@paraConstr(theta.hat),
+           joe = copJoe@paraConstr(theta.hat))
+  if(!illegalpar){
     stop("Illegal parameter value")
+  }
   d <- length(alphavec)
   if(d == 2 && family %in% c("gumbel","clayton")){
-    boot.rep <- sapply(1:B, function(x){
-    cor.fk(rliouv(n = n, family, alphavec, theta.hat))[1, 2]
-    })
+    boot.rep <- sapply(seq_len(B), function(x){
+      if (!requireNamespace("wdm", quietly = TRUE)) {
+        cor(x = rliouv(n = n, 
+                       family = family, 
+                       alphavec = alphavec,
+                       theta = theta.hat),
+            method = "kendall")
+      } else{
+        wdm::wdm(x = rliouv(n = n, 
+                           family = family, 
+                           alphavec = alphavec,
+                           theta = theta.hat),
+                            method = "kendall")
+      } })
     quantiles = NaN
     if(is.vector(quant)){
-      quantiles = liouv.iTau(quantile(boot.rep, probs = quant), family, alphavec)
+      quantiles = liouv.iTau(
+        quantile(boot.rep, probs = quant), 
+        family, alphavec)
     }
     return(list(quantiles = quantiles, boot_kendall = boot.rep))
   }  else{
     boot.rep <- sapply(1:B, function(x){
-      if(silent==FALSE){print(paste("Step", x))}
+      if(silent == FALSE){
+        print(paste("Step", x))
+        }
       boot.samp <- rliouv(n = n, family, alphavec, theta.hat)
       boot.opt <- liouv.maxim(boot.samp, family, lattice.mat = as.matrix(t(alphavec)), MC.approx = FALSE,
                             interval = switch(family, gumbel = c(1.001, 10),

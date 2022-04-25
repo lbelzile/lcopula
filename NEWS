@@ -1,4 +1,8 @@
 
+lcopula v0.5  		2022-04-25
+############################
+*Change dependency from pcaPP to wdm (now optional)
+
 lcopula v0.4  		2018-07-06
 ############################
 *Fix overloading ambiguity for Solaris

@@ -1,4 +1,4 @@
-##  Copyright (C) 2015-2016 Leo Belzile
+##  Copyright (C) 2015-2022 Leo Belzile
 ##
 ##  This file is part of the "lcopula" package for R.  This program
 ##  is free software; you can redistribute it and/or modify it under the
@@ -134,34 +134,74 @@ pickands.liouv<-function(t, rho=0.5, alpha=c(1,1),CDA=c("C","S")){
 #' @return a plot of the Pickands dependence function
 #' @export
 #' @examples
-#' pickands.plot(rho=0.9, alpha=c(1,1), col="slateblue1", CDA="C")
-#' pickands.plot(rho=0.9, alpha=c(2,3), col="slateblue2", CDA="C", plot.new=FALSE)
-#' pickands.plot(rho=0.5, alpha=c(2,3), col="slateblue3", CDA="C", plot.new=FALSE)
+#' pickands.plot(
+#'   rho = 0.9, 
+#'   alpha = c(1,1), 
+#'   col = "slateblue1", 
+#'   CDA = "C")
+#' pickands.plot(
+#'   rho = 0.9, 
+#'   alpha = c(2,3),
+#'   col = "slateblue2", 
+#'   CDA = "C", 
+#'   plot.new = FALSE)
+#' pickands.plot(
+#'  rho = 0.5, 
+#'  alpha = c(2,3), 
+#'  col = "slateblue3", 
+#'  CDA = "C", 
+#'  plot.new = FALSE)
 #' #Parameters for the Pickands function of the scaled Dirichlet need not be integer
-#' pickands.plot(rho=0.9, alpha=c(1,1), CDA="S")
-#' pickands.plot(rho=0.9, alpha=c(0.2,0.5), col="darkred", CDA="S", plot.new=FALSE)
-#' pickands.plot(rho=0.8, alpha=c(1.2,0.1), col="red", CDA="S", plot.new=FALSE)
-pickands.plot<-function(rho, alpha, plot.new=T,CDA=c("C","S"), tikz=F, ...){
+#' pickands.plot(
+#'   rho = 0.9, 
+#'   alpha = c(1,1), 
+#'   CDA = "S")
+#' pickands.plot(
+#'   rho = 0.9, 
+#'   alpha = c(0.2,0.5), 
+#'   col = "darkred", 
+#'   CDA = "S", 
+#'   plot.new = FALSE)
+#' pickands.plot(
+#'  rho = 0.8, 
+#'  alpha = c(1.2,0.1), 
+#'  col = "red", 
+#'  CDA = "S", 
+#'  plot.new = FALSE)
+pickands.plot <- function(
+    rho, 
+    alpha, 
+    plot.new = TRUE, 
+    CDA = c("C","S"), 
+    tikz = FALSE, 
+    ...){
   #Check conditions
-  if(missing(CDA)==TRUE){
-    CDA="C"
-    warning("Setting default to Liouville CDA. Use CDA=`S` for the Dirichlet model")
-  }
-  if(length(rho)!=1){stop("rho must be 1-dimensional")}
+   CDA <- match.arg(CDA)
+   if(length(rho)!=1){
+    stop("rho must be 1-dimensional")
+    }
   if(length(alpha)!=2){
     stop("Not implemented beyond bivariate case")
   }
-  if(plot.new==TRUE){
+  if(isTRUE(plot.new)){
     plot.new()
     plot.window(c(0,1), c(0.5,1))
-    axis(side=2, at=seq(0.5,1,by=0.1), pos=0,las=2,tck=0.01)
-    axis(side=1, at=seq(0,1,by=0.1), pos=0.5,las=0,tck=0.01)
+    axis(side=2, 
+         at=seq(0.5, 1, by=0.1), 
+         pos=0,
+         las=2,
+         tck=0.01)
+    axis(side=1, 
+         at=seq(0, 1, by=0.1), 
+         pos=0.5,
+         las=0,
+         tck=0.01)
     #title("Pickands dependence function")
     #Empirical bounds
     lines(c(0,0.5),c(1,0.5),lty=3,col="gray")
     lines(c(0.5,1),c(0.5,1),lty=3,col="gray")
     lines(c(0,1),c(1,1),lty=3,col="gray")
-    if(tikz==TRUE){
+    if(isTRUE(tikz)){
       mtext("$t$", side=1, line=2)
       mtext("$\\mathrm{A}(t)$", side=2, line=2)
     } else{
@@ -170,12 +210,20 @@ pickands.plot<-function(rho, alpha, plot.new=T,CDA=c("C","S"), tikz=F, ...){
     }
 
   }
-  x = seq(0,1,by=0.001)
-  if(CDA=="C"){
-    lines(x=x,y=c(1,.pickands.fun(x[-c(1,length(x))],alpha=alpha, rho=rho),1),type="l",...)
-  }
-  if(CDA=="S"){
-    lines(x=x,y=.pickands.dir(x,alpha=alpha,rho=rho),type="l",...)
+  x = seq(0, 1, by = 0.001)
+  if(CDA == "C"){
+    lines(x=x,
+          y=c(1,.pickands.fun(x[-c(1,length(x))],
+                              alpha=alpha,
+                              rho=rho),1),
+          type="l",
+          ...)
+  } else if(CDA == "S"){
+    lines(x=x,
+          y=.pickands.dir(x,
+                          alpha=alpha,
+                          rho=rho),
+          type="l",...)
   }
 }
 #' Kendall plot

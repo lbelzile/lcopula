@@ -4,8 +4,14 @@
 \alias{pickands.plot}
 \title{Plot Pickands dependence function for CDA of Liouville copulas}
 \usage{
-pickands.plot(rho, alpha, plot.new = T, CDA = c("C", "S"), tikz = F,
-  ...)
+pickands.plot(
+  rho,
+  alpha,
+  plot.new = TRUE,
+  CDA = c("C", "S"),
+  tikz = FALSE,
+  ...
+)
 }
 \arguments{
 \item{rho}{index of regular variation parameter}
@@ -29,11 +35,38 @@ The function will draw the Pickands dependence function for output in \code{tikz
 the corresponding function is selected.
 }
 \examples{
-pickands.plot(rho=0.9, alpha=c(1,1), col="slateblue1", CDA="C")
-pickands.plot(rho=0.9, alpha=c(2,3), col="slateblue2", CDA="C", plot.new=FALSE)
-pickands.plot(rho=0.5, alpha=c(2,3), col="slateblue3", CDA="C", plot.new=FALSE)
+pickands.plot(
+  rho = 0.9, 
+  alpha = c(1,1), 
+  col = "slateblue1", 
+  CDA = "C")
+pickands.plot(
+  rho = 0.9, 
+  alpha = c(2,3),
+  col = "slateblue2", 
+  CDA = "C", 
+  plot.new = FALSE)
+pickands.plot(
+ rho = 0.5, 
+ alpha = c(2,3), 
+ col = "slateblue3", 
+ CDA = "C", 
+ plot.new = FALSE)
 #Parameters for the Pickands function of the scaled Dirichlet need not be integer
-pickands.plot(rho=0.9, alpha=c(1,1), CDA="S")
-pickands.plot(rho=0.9, alpha=c(0.2,0.5), col="darkred", CDA="S", plot.new=FALSE)
-pickands.plot(rho=0.8, alpha=c(1.2,0.1), col="red", CDA="S", plot.new=FALSE)
+pickands.plot(
+  rho = 0.9, 
+  alpha = c(1,1), 
+  CDA = "S")
+pickands.plot(
+  rho = 0.9, 
+  alpha = c(0.2,0.5), 
+  col = "darkred", 
+  CDA = "S", 
+  plot.new = FALSE)
+pickands.plot(
+ rho = 0.8, 
+ alpha = c(1.2,0.1), 
+ col = "red", 
+ CDA = "S", 
+ plot.new = FALSE)
 }
