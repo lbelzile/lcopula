@@ -9,7 +9,7 @@ The \code{airquality} data frame consists of measurements of pollutants in the c
  "The dataset comprise daily series of monitoring measurements of ozone levels (O3), nitrogen dioxide (NO2), nitrogen oxide (NO) and particulate matter (PM10), in the city centre of Leeds, UK, over 1994--1998. Levels of the gases are measured in parts per billion, and those of PM 10 in micrograms per cubic metre. "
 }
 \details{
-Downloaded from \url{http://www.airquality.co.uk}. (c) Crown 2015 copyright Defra via uk-air.defra.gov.uk, licenced under the Open Government Licence (OGL).
+Downloaded from \url{https://uk-air.defra.gov.uk/}. (c) Crown 2015 copyright Defra via uk-air.defra.gov.uk, licenced under the Open Government Licence (OGL).
 }
 \references{
 Heffernan, J., Tawn, J. (2004)  A conditional approach for multivariate extreme values (with discussion).   \emph{J. R. Stat. Soc., Ser. B Stat. Methodol.} \bold{66}(3), 497--546.
