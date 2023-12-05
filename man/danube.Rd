@@ -6,7 +6,7 @@
 \title{Ranks of preprocessed monthly Danube river flow measurements}
 \format{
 This data frame contains the following columns:
-\itemize{
+\describe{
      \item{inn}{A numeric vector containing the rank of prewhitened level observations of the Inn river at Nagyramos.}
      \item{donau}{A numeric vector containing the rank of prewhitened level observations of the Donau river at Scharding.}
 }

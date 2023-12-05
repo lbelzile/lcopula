@@ -4,7 +4,7 @@
 \alias{H_inv}
 \title{Inverse survival function if Monte-Carlo approximation is set to \code{TRUE} in \code{liouv.maxim}}
 \usage{
-H_inv(u, alphavec, family, theta, MC = 1e+05, TRUNC = FALSE)
+H_inv(u, alphavec, family, theta, MC = 100000L, TRUNC = FALSE)
 }
 \arguments{
 \item{u}{data at which to compute the survival inverse}
@@ -17,7 +17,7 @@ H_inv(u, alphavec, family, theta, MC = 1e+05, TRUNC = FALSE)
 
 \item{MC}{number of Monte-Carlo points for evaluation}
 
-\item{trunc}{whether to truncate at low quantile. Will be based on numerical root finding for the lower 0.025 fraction of the data}
+\item{TRUNC}{whether to truncate at low quantile. Will be based on numerical root finding for the lower 0.025 fraction of the data}
 }
 \value{
 Inverse survival function values

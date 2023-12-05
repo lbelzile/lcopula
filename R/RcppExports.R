@@ -49,7 +49,3 @@ negdirspecdens <- function(param, dat, d, transform = TRUE) {
     .Call('_lcopula_ctspecdens', PACKAGE = 'lcopula', param, dat, transform)
 }
 
-# Register entry points for exported C++ functions
-methods::setLoadAction(function(ns) {
-    .Call('_lcopula_RcppExport_registerCCallable', PACKAGE = 'lcopula')
-})

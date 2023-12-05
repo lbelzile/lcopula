@@ -1,6 +1,6 @@
 # lcopula
 
-[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/lcopula)](https://cran.r-project.org/package=lcopula)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version-last-release/lcopula)](https://cran.r-project.org/package=lcopula)
 [![License](https://img.shields.io/badge/license-GPL%20%28%3E=%203%29-blue.svg?style=flat)](http://www.gnu.org/licenses/gpl-3.0.html) 
 [![Downloads](http://cranlogs.r-pkg.org/badges/lcopula?color=brightgreen)](http://www.r-pkg.org/pkg/lcopula)
 

@@ -1,6 +1,6 @@
-// [[Rcpp::interfaces(r, cpp)]]
 #include <Rcpp.h>
 using namespace Rcpp;
+
 
 //' Rcpp function to compute sum of rows and couple according to alphavec
 //'

@@ -833,7 +833,7 @@ liouv.iTau = Vectorize(.liouv.iTau_s, "tau_hat")
 #' @param family family of the Liouville copula. Either \code{"clayton"}, \code{"gumbel"}, \code{"frank"}, \code{"AMH"} or \code{"joe"}
 #' @param theta parameter of the corresponding Archimedean copula
 #' @param MC number of Monte-Carlo points for evaluation
-#' @param trunc whether to truncate at low quantile. Will be based on numerical root finding for the lower 0.025 fraction of the data
+#' @param TRUNC whether to truncate at low quantile. Will be based on numerical root finding for the lower 0.025 fraction of the data
 #'
 #' @return Inverse survival function values
 #' @examples
@@ -844,7 +844,7 @@ liouv.iTau = Vectorize(.liouv.iTau_s, "tau_hat")
 #' sum(abs(H_inv(u=u, family="frank", alphavec=c(2,3), theta=2)-
 #' isliouv_m(u=u, family="frank", alphavec=c(2,3), theta=2)))
 #' }
-H_inv <-  function(u, alphavec, family, theta, MC = 100000, TRUNC = FALSE){
+H_inv <-  function(u, alphavec, family, theta, MC = 1e5L, TRUNC = FALSE){
   alphavec <- as.integer(alphavec)
   if(isTRUE(any(alphavec==0))){stop("Invalid parameters")}
   family <-  match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
