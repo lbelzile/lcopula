@@ -15,6 +15,9 @@ sliouv(theta, x, family, alphavec)
 
 \item{alphavec}{\code{d}-vector of Dirichlet allocations (must be a vector of integers)}
 }
+\value{
+a vector with the survival function
+}
 \description{
 \code{sliouv} returns the survival function of a Liouville vector. For the survival copula
 and the associated probability, see \code{\link{pliouv}}.

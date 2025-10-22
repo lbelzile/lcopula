@@ -17,7 +17,6 @@
 ##  MA 02111-1307 USA or look up the web page
 ##  http://www.gnu.org/copyleft/gpl.html.
 
-
 ##########################################################################
 ##             Archimedean Liouville generation and estimation          ##
 ##                        Version of July 05th, 2016                    ##
@@ -37,7 +36,6 @@
 # require(copula)
 
 ##########################################################################
-
 
 ## Necessary global imports for the methods for NAMESPACE
 ## Note that stats cannot be imported because it is already loaded by copula
@@ -66,42 +64,51 @@ NULL
 #' rarchi(n = 100, "gumbel", d = 4, theta = 2)
 #' #Sample from the independence copula
 #' rarchi(n = 100, "gumbel", d = 4, theta = 1)
-rarchi <-  function(n, family, d, theta){
-  family <-  match.arg(family, c("clayton","gumbel","frank","AMH","joe"))
+rarchi <- function(n, family, d, theta) {
+  family <- match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
   #Marshall-Olkin algorithm
-  illegalpar <-  switch(family,
-                       clayton = copClayton@paraConstr(theta),
-                       gumbel = copGumbel@paraConstr(theta),
-                       frank = copFrank@paraConstr(theta),
-                       AMH = copAMH@paraConstr(theta),
-                       joe = copJoe@paraConstr(theta))
-  if(!illegalpar){
+  illegalpar <- switch(
+    family,
+    clayton = copClayton@paraConstr(theta),
+    gumbel = copGumbel@paraConstr(theta),
+    frank = copFrank@paraConstr(theta),
+    AMH = copAMH@paraConstr(theta),
+    joe = copJoe@paraConstr(theta)
+  )
+  if (!illegalpar) {
     stop("Illegal parameter value")
   }
-  independence <-  switch(family,
-                         clayton = (theta == 0),
-                         gumbel = (theta == 1),
-                         frank = (theta == 0),
-                         AMH = (theta == 0),
-                         joe = (theta == 1))
-  U <-  runif(n * d)
-  U <-  matrix(U, nrow = n, ncol = d)
-  if(independence)
-    return(U)
-  Y <-  switch(family,
-              clayton = rgamma(n, shape = 1/theta, scale = theta),
-              gumbel = copGumbel@V0(n, theta),
-              frank = copFrank@V0(n, theta),
-              AMH = copAMH@V0(n, theta),
-              joe = copJoe@V0(n, theta))
-  Y <-  matrix(Y, nrow = n, ncol = d)
-  phi.inverse <-  switch(family,
-                        clayton = function(t, theta){(1 + theta*t)^(-1/theta)},
-                        gumbel = copGumbel@psi,
-                        frank = copFrank@psi,
-                        AMH = copAMH@psi,
-                        joe = copJoe@psi)
-  return(phi.inverse( - log(U)/Y, theta))
+  independence <- switch(
+    family,
+    clayton = (theta == 0),
+    gumbel = (theta == 1),
+    frank = (theta == 0),
+    AMH = (theta == 0),
+    joe = (theta == 1)
+  )
+  U <- runif(n * d)
+  U <- matrix(U, nrow = n, ncol = d)
+  if (independence) return(U)
+  Y <- switch(
+    family,
+    clayton = rgamma(n, shape = 1 / theta, scale = theta),
+    gumbel = copGumbel@V0(n, theta),
+    frank = copFrank@V0(n, theta),
+    AMH = copAMH@V0(n, theta),
+    joe = copJoe@V0(n, theta)
+  )
+  Y <- matrix(Y, nrow = n, ncol = d)
+  phi.inverse <- switch(
+    family,
+    clayton = function(t, theta) {
+      (1 + theta * t)^(-1 / theta)
+    },
+    gumbel = copGumbel@psi,
+    frank = copFrank@psi,
+    AMH = copAMH@psi,
+    joe = copJoe@psi
+  )
+  return(phi.inverse(-log(U) / Y, theta))
 }
 
 
@@ -137,42 +144,46 @@ rarchi <-  function(n, family, d, theta){
 #' x <- rliouv(n=100, family="frank", theta=1.5, alphavec=c(2,3))
 #' pliouv(theta=1.5, x=x,family="frank", alphavec=c(2,3))
 #' }
-rliouv <-  function(n = 100, family, alphavec, theta, reverse = FALSE){
-  family <-  match.arg(family, c("clayton","gumbel","frank","AMH","joe"))
+rliouv <- function(n = 100, family, alphavec, theta, reverse = FALSE) {
+  family <- match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
   alphavec <- as.integer(alphavec)
-  if(isTRUE(any(alphavec==0))){stop("Invalid parameters")}
-  alpha <-  sum(alphavec)
-  d <-  length(alphavec)
-  illegalpar <-  switch(family,
-                       clayton = copClayton@paraConstr(theta),
-                       gumbel = copGumbel@paraConstr(theta),
-                       frank = copFrank@paraConstr(theta),
-                       AMH = copAMH@paraConstr(theta),
-                       joe = copJoe@paraConstr(theta))
-  if(!illegalpar)
-    stop("Illegal parameter value")
-  t <-  rarchi(n, family, alpha, theta)
-  Xtildedata <-  switch(family,
-                       clayton = (t^(-theta)-1)/theta,
-                       gumbel = copGumbel@iPsi(t, theta),
-                       frank = copFrank@iPsi(t, theta),
-                       AMH = copAMH@iPsi(t, theta),
-                       joe = copJoe@iPsi(t, theta))
-  groups <-  c(0, cumsum(alphavec))
-  Xdata <-  matrix(0, nrow = n, ncol = d)
-  Udata <-  Xdata
-  for (j in 1:d){
-    class <-  ((groups[j]+1):groups[j+1])
-    for (i in class)
-      Xdata[, j] <-  Xdata[, j]+Xtildedata[, i]
+  if (isTRUE(any(alphavec == 0))) {
+    stop("Invalid parameters")
   }
-  for (j in 1:d){
-    Udata[, j] <-  sliouvm(Xdata[, j], family, alphavec[j], theta)
+  alpha <- sum(alphavec)
+  d <- length(alphavec)
+  illegalpar <- switch(
+    family,
+    clayton = copClayton@paraConstr(theta),
+    gumbel = copGumbel@paraConstr(theta),
+    frank = copFrank@paraConstr(theta),
+    AMH = copAMH@paraConstr(theta),
+    joe = copJoe@paraConstr(theta)
+  )
+  if (!illegalpar) stop("Illegal parameter value")
+  t <- rarchi(n, family, alpha, theta)
+  Xtildedata <- switch(
+    family,
+    clayton = (t^(-theta) - 1) / theta,
+    gumbel = copGumbel@iPsi(t, theta),
+    frank = copFrank@iPsi(t, theta),
+    AMH = copAMH@iPsi(t, theta),
+    joe = copJoe@iPsi(t, theta)
+  )
+  groups <- c(0, cumsum(alphavec))
+  Xdata <- matrix(0, nrow = n, ncol = d)
+  Udata <- Xdata
+  for (j in 1:d) {
+    class <- ((groups[j] + 1):groups[j + 1])
+    for (i in class) Xdata[, j] <- Xdata[, j] + Xtildedata[, i]
   }
-  if(reverse == FALSE){
+  for (j in 1:d) {
+    Udata[, j] <- sliouvm(Xdata[, j], family, alphavec[j], theta)
+  }
+  if (reverse == FALSE) {
     return(Udata)
-  } else{
-    return(1-Udata)
+  } else {
+    return(1 - Udata)
   }
 }
 
@@ -211,27 +222,53 @@ rliouv <-  function(n = 100, family, alphavec, theta, reverse = FALSE){
 #' }
 #' @rdname  Liouville_marginal
 #' @export
-sliouvm <- function(x, family, alpha, theta){
-  family <-  match.arg(family, c("clayton","gumbel","frank","AMH","joe"))
+sliouvm <- function(x, family, alpha, theta) {
+  family <- match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
   alpha <- as.integer(alpha)
-  if(alpha==0){stop("Invalid parameter alpha")}
-  out <- switch(family,
-               gumbel = copGumbel@psi(t = x, theta),
-               clayton = copClayton@psi(t = x*theta, theta),
-               frank = copFrank@psi(t = x, theta),
-               AMH = copAMH@psi(t = x, theta),
-               joe = copJoe@psi(t = x, theta))
-  if(alpha>1){
-  for(i in 1:(alpha-1)){
-      out <-  out + exp(i*log(ifelse(is.infinite(x),1e40,x))-lgamma(i+1)+
-                        switch(family,
-                               gumbel = copGumbel@absdPsi(x, theta = theta, degree = i, log = TRUE),
-                               clayton = copClayton@absdPsi(x*theta, theta = theta, degree = i, log = TRUE)+i*log(theta),
-                               frank = copFrank@absdPsi(x, theta = theta, degree = i, log = TRUE),
-                               AMH = copAMH@absdPsi(x, theta = theta, degree = i, log = TRUE),
-                               joe = copJoe@absdPsi(x, theta = theta, degree = i, log = TRUE))
-      )
+  if (alpha == 0) {
+    stop("Invalid parameter alpha")
   }
+  out <- switch(
+    family,
+    gumbel = copGumbel@psi(t = x, theta),
+    clayton = copClayton@psi(t = x * theta, theta),
+    frank = copFrank@psi(t = x, theta),
+    AMH = copAMH@psi(t = x, theta),
+    joe = copJoe@psi(t = x, theta)
+  )
+  if (alpha > 1) {
+    for (i in 1:(alpha - 1)) {
+      out <- out +
+        exp(
+          i *
+            log(ifelse(is.infinite(x), 1e40, x)) -
+            lgamma(i + 1) +
+            switch(
+              family,
+              gumbel = copGumbel@absdPsi(
+                x,
+                theta = theta,
+                degree = i,
+                log = TRUE
+              ),
+              clayton = copClayton@absdPsi(
+                x * theta,
+                theta = theta,
+                degree = i,
+                log = TRUE
+              ) +
+                i * log(theta),
+              frank = copFrank@absdPsi(
+                x,
+                theta = theta,
+                degree = i,
+                log = TRUE
+              ),
+              AMH = copAMH@absdPsi(x, theta = theta, degree = i, log = TRUE),
+              joe = copJoe@absdPsi(x, theta = theta, degree = i, log = TRUE)
+            )
+        )
+    }
   }
   return(out)
 }
@@ -241,9 +278,9 @@ sliouvm <- function(x, family, alpha, theta){
 # Calls \code{sliouvm} to return cdf
 #'@rdname Liouville_marginal
 #'@export
-pliouvm <- function(x, family, alpha, theta){
-  family <-  match.arg(family, c("clayton","gumbel","frank","AMH","joe"))
-  return(1-sliouvm(x, family, alpha, theta))
+pliouvm <- function(x, family, alpha, theta) {
+  family <- match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
+  return(1 - sliouvm(x, family, alpha, theta))
 }
 
 ##########################################################################
@@ -262,40 +299,67 @@ pliouvm <- function(x, family, alpha, theta){
 #' all(sliouv_m(x, family="gumbel", alphavec=c(2,3), theta=2)[,1]-
 #'   sliouvm(x[,1], family="gumbel", alpha=2, theta=2)==0)
 #' @return a matrix of same length as \code{x} with the survival probabilities
-sliouv_m <- function(x, family, alphavec, theta){
+sliouv_m <- function(x, family, alphavec, theta) {
   alphavec <- as.integer(alphavec)
-  if(any(alphavec)==0){stop("Invalid parameters")}
-  family <-  match.arg(family, c("clayton","gumbel","frank","AMH","joe"))
-  eval.Surv <-  function(x, alpha){
-    der <-  matrix(nrow = alpha, ncol = length(x))
-    der[1, ] <-  switch(family,
-                      gumbel = copGumbel@psi(t = x, theta = theta),
-                      clayton = copClayton@psi(t = x*theta, theta = theta),
-                      frank = copFrank@psi(t = x, theta = theta),
-                      AMH = copAMH@psi(t = x, theta = theta),
-                      joe = copJoe@psi(t = x, theta = theta))
-    if(alpha > 1){
-      for(i in 1:(alpha-1)){
-        der[i+1, ] <-  exp(i*log(x)-lgamma(i+1)+switch(family,
-                                                     gumbel = copGumbel@absdPsi(x, theta = theta, degree = i, log = TRUE),
-                                                     clayton = copClayton@absdPsi(x*theta, theta = theta, degree = i, log = TRUE)+i*log(theta),
-                                                     frank = copFrank@absdPsi(x, theta = theta, degree = i, log = TRUE),
-                                                     AMH = copAMH@absdPsi(x, theta = theta, degree = i, log = TRUE),
-                                                     joe = copJoe@absdPsi(x, theta = theta, degree = i, log = TRUE)))
+  if (any(alphavec) == 0) {
+    stop("Invalid parameters")
+  }
+  family <- match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
+  eval.Surv <- function(x, alpha) {
+    der <- matrix(nrow = alpha, ncol = length(x))
+    der[1, ] <- switch(
+      family,
+      gumbel = copGumbel@psi(t = x, theta = theta),
+      clayton = copClayton@psi(t = x * theta, theta = theta),
+      frank = copFrank@psi(t = x, theta = theta),
+      AMH = copAMH@psi(t = x, theta = theta),
+      joe = copJoe@psi(t = x, theta = theta)
+    )
+    if (alpha > 1) {
+      for (i in 1:(alpha - 1)) {
+        der[i + 1, ] <- exp(
+          i *
+            log(x) -
+            lgamma(i + 1) +
+            switch(
+              family,
+              gumbel = copGumbel@absdPsi(
+                x,
+                theta = theta,
+                degree = i,
+                log = TRUE
+              ),
+              clayton = copClayton@absdPsi(
+                x * theta,
+                theta = theta,
+                degree = i,
+                log = TRUE
+              ) +
+                i * log(theta),
+              frank = copFrank@absdPsi(
+                x,
+                theta = theta,
+                degree = i,
+                log = TRUE
+              ),
+              AMH = copAMH@absdPsi(x, theta = theta, degree = i, log = TRUE),
+              joe = copJoe@absdPsi(x, theta = theta, degree = i, log = TRUE)
+            )
+        )
       }
     }
     return(colSums(der))
   }
-  if(is.matrix(x)){
-    if(dim(x)[2] != length(alphavec))
+  if (is.matrix(x)) {
+    if (dim(x)[2] != length(alphavec))
       stop("Length of the parameter vector does not match input")
     result <- list()
-    for(j in 1:(dim(x)[2])){
+    for (j in 1:(dim(x)[2])) {
       result[[j]] <- eval.Surv(x[, j], alphavec[j])
     }
     result <- unlist(result)
-  }  else{
-    result <-  eval.Surv(x, alphavec[1])
+  } else {
+    result <- eval.Surv(x, alphavec[1])
   }
   return(matrix(result, nrow = nrow(x), ncol = ncol(x)))
 }
@@ -305,26 +369,41 @@ sliouv_m <- function(x, family, alphavec, theta){
 # Survival analog to \code{'q'} in R for functions
 #'@rdname Liouville_marginal
 #'@export
-isliouvm <-  function(u, family, alpha, theta){
+isliouvm <- function(u, family, alpha, theta) {
   alpha <- as.integer(alpha)
-  if(length(alpha)>1){warning("`alpha' must be an integer. Using only the first argument")}
+  if (length(alpha) > 1) {
+    warning("`alpha' must be an integer. Using only the first argument")
+  }
   alpha <- alpha[1]
-  if(alpha==0){stop("Invalid parameter alpha")}
-  family <-  match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
-  out <-  rep(0, length(u))
-  rootfunc <-  function(z, u, family, theta, alpha) {
-    sliouvm(exp(z), family, alpha, theta)-u
+  if (alpha == 0) {
+    stop("Invalid parameter alpha")
+  }
+  family <- match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
+  out <- rep(0, length(u))
+  rootfunc <- function(z, u, family, theta, alpha) {
+    sliouvm(exp(z), family, alpha, theta) - u
   }
   for (i in 1:length(u)) {
     #Handling of 0 for the Gumbel
-    tmp <-  uniroot(rootfunc, lower = -1e60, upper = 1e+60, u = u[i], f.lower=1-u[i], f.upper=-u[i],
-    	#f.lower = 1, f.upper = -1e+60,
-                   extendInt="downX", family = family, theta = theta, alpha = alpha)
-       if(tmp$root > 1e58){#Beyond numerical precision, probably not needed
-      	tmp$root <- Inf
-      } else if(tmp$root < -1e40){
-      	tmp$root <- -Inf
-      }
+    tmp <- uniroot(
+      rootfunc,
+      lower = -1e60,
+      upper = 1e+60,
+      u = u[i],
+      f.lower = 1 - u[i],
+      f.upper = -u[i],
+      #f.lower = 1, f.upper = -1e+60,
+      extendInt = "downX",
+      family = family,
+      theta = theta,
+      alpha = alpha
+    )
+    if (tmp$root > 1e58) {
+      #Beyond numerical precision, probably not needed
+      tmp$root <- Inf
+    } else if (tmp$root < -1e40) {
+      tmp$root <- -Inf
+    }
     out[i] <- exp(tmp$root)
   }
   out
@@ -343,23 +422,35 @@ isliouvm <-  function(u, family, alpha, theta){
 #' @examples
 #' u <- rliouv(n = 10, family = "clayton", alphavec <- c(2,3), theta = 2)
 #' isliouv_m(u=u, family="clayton", alphavec=c(2,3), theta=2)
-isliouv_m <-  function(u, family, alphavec, theta){
+isliouv_m <- function(u, family, alphavec, theta) {
   alphavec <- as.integer(alphavec)
-  if(isTRUE(any(alphavec==0))){stop("Invalid parameters")}
-  family <-  match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
-  out <-  matrix(nrow = nrow(u), ncol = ncol(u))
-  rootfunc <-  function(z, u, family, theta, alpha)  {
-    sliouvm(exp(z), family, alpha, theta)-u
+  if (isTRUE(any(alphavec == 0))) {
+    stop("Invalid parameters")
   }
-  for (i in 1:nrow(u)){
-    for(j in 1:ncol(u)){
-      tmp <-  uniroot(rootfunc, lower = -1e60, upper = 1e+60, u = u[i, j], f.lower=1-u[i,j], f.upper=-u[i,j],
-      	#f.lower = 1, f.upper = -1e+60,
-                     family = family, theta = theta, alpha = alphavec[j])
-      if(tmp$root > 1e58){#Beyond numerical precision
-      	tmp$root <- Inf
-      } else if(tmp$root < -1e40){
-      	tmp$root <- -Inf
+  family <- match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
+  out <- matrix(nrow = nrow(u), ncol = ncol(u))
+  rootfunc <- function(z, u, family, theta, alpha) {
+    sliouvm(exp(z), family, alpha, theta) - u
+  }
+  for (i in 1:nrow(u)) {
+    for (j in 1:ncol(u)) {
+      tmp <- uniroot(
+        rootfunc,
+        lower = -1e60,
+        upper = 1e+60,
+        u = u[i, j],
+        f.lower = 1 - u[i, j],
+        f.upper = -u[i, j],
+        #f.lower = 1, f.upper = -1e+60,
+        family = family,
+        theta = theta,
+        alpha = alphavec[j]
+      )
+      if (tmp$root > 1e58) {
+        #Beyond numerical precision
+        tmp$root <- Inf
+      } else if (tmp$root < -1e40) {
+        tmp$root <- -Inf
       }
       out[i, j] <- exp(tmp$root)
     }
@@ -375,51 +466,99 @@ isliouv_m <-  function(u, family, alphavec, theta){
 #' @param family family of the Liouville copula. Either \code{"clayton"}, \code{"gumbel"}, \code{"frank"}, \code{"AMH"} or \code{"joe"}
 #' @param alphavec \code{d}-vector of Dirichlet allocations (must be a vector of integers)
 #' @param theta parameter of the corresponding Archimedean copula
+#' @return a vector with the survival function
 #' @export
-sliouv <- function(theta, x, family, alphavec){
+sliouv <- function(theta, x, family, alphavec) {
   alphavec <- as.integer(alphavec)
-  if(isTRUE(c(any(alphavec==0), any(x<0)))){stop("Invalid parameters")}
-  family <-  match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
-  combo = unique(combn(unlist(sapply(alphavec, function(y){seq(1:y)})), length(alphavec)), MARGIN = 2)-1
+  if (isTRUE(c(any(alphavec == 0), any(x < 0)))) {
+    stop("Invalid parameters")
+  }
+  family <- match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
+  combo = unique(
+    combn(
+      unlist(sapply(alphavec, function(y) {
+        seq(1:y)
+      })),
+      length(alphavec)
+    ),
+    MARGIN = 2
+  ) -
+    1
 
-  surv <- function(x, alphasubvec){
-    if(length(alphasubvec)!=length(x)){stop("Invalid call to `surv' in function `sliouv'")}
-    if(sum(alphasubvec) != 0){
-      a <- alphasubvec*log(x)
-      if(isTRUE(any(alphasubvec==0, is.infinite(x)))){#Dealing with limit cases on the boundary,
+  surv <- function(x, alphasubvec) {
+    if (length(alphasubvec) != length(x)) {
+      stop("Invalid call to `surv' in function `sliouv'")
+    }
+    if (sum(alphasubvec) != 0) {
+      a <- alphasubvec * log(x)
+      if (isTRUE(any(alphasubvec == 0, is.infinite(x)))) {
+        #Dealing with limit cases on the boundary,
         #for which the formula ain't valid - setting the function to zero b/c the generator only matters in the limit
-        a[union(which(alphasubvec==0),which(is.infinite(x)))] <- 0
+        a[union(which(alphasubvec == 0), which(is.infinite(x)))] <- 0
       }
-        #Yields 0*Inf or similar problematic cases
-        exp(sum(a)-sum(lgamma(alphasubvec+1)) +
-          switch(family,
-                 gumbel = copGumbel@absdPsi(sum(x), theta = theta, degree = sum(alphasubvec), log = TRUE),
-                 clayton = copClayton@absdPsi(t = theta*sum(x), theta = theta, degree = sum(alphasubvec), log = TRUE) +
-                   sum(alphasubvec)*log(theta),
-                 frank = copFrank@absdPsi(sum(x), theta = theta, degree = sum(alphasubvec), log = TRUE),
-                 AMH = copAMH@absdPsi(sum(x), theta = theta, degree = sum(alphasubvec), log = TRUE),
-                 joe = copJoe@absdPsi(sum(x), theta = theta, degree = sum(alphasubvec), log = TRUE)))
-      } else {
-      switch(family,
-             gumbel = copGumbel@psi(sum(x), theta = theta),
-             clayton = copClayton@psi(t = theta*sum(x), theta = theta),
-             frank = copFrank@psi(sum(x), theta = theta),
-             AMH = copAMH@psi(sum(x), theta = theta),
-             joe = copJoe@psi(sum(x), theta = theta))
+      #Yields 0*Inf or similar problematic cases
+      exp(
+        sum(a) -
+          sum(lgamma(alphasubvec + 1)) +
+          switch(
+            family,
+            gumbel = copGumbel@absdPsi(
+              sum(x),
+              theta = theta,
+              degree = sum(alphasubvec),
+              log = TRUE
+            ),
+            clayton = copClayton@absdPsi(
+              t = theta * sum(x),
+              theta = theta,
+              degree = sum(alphasubvec),
+              log = TRUE
+            ) +
+              sum(alphasubvec) * log(theta),
+            frank = copFrank@absdPsi(
+              sum(x),
+              theta = theta,
+              degree = sum(alphasubvec),
+              log = TRUE
+            ),
+            AMH = copAMH@absdPsi(
+              sum(x),
+              theta = theta,
+              degree = sum(alphasubvec),
+              log = TRUE
+            ),
+            joe = copJoe@absdPsi(
+              sum(x),
+              theta = theta,
+              degree = sum(alphasubvec),
+              log = TRUE
+            )
+          )
+      )
+    } else {
+      switch(
+        family,
+        gumbel = copGumbel@psi(sum(x), theta = theta),
+        clayton = copClayton@psi(t = theta * sum(x), theta = theta),
+        frank = copFrank@psi(sum(x), theta = theta),
+        AMH = copAMH@psi(sum(x), theta = theta),
+        joe = copJoe@psi(sum(x), theta = theta)
+      )
     }
   }
 
-  result = apply(combo, 2, function(alpha_combo){
-      if(is.matrix(x)){
-         apply(x,1, function(x){surv(x, alphasubvec=alpha_combo)})
-       } else{
-       surv(x)
-      }
+  result = apply(combo, 2, function(alpha_combo) {
+    if (is.matrix(x)) {
+      apply(x, 1, function(x) {
+        surv(x, alphasubvec = alpha_combo)
+      })
+    } else {
+      surv(x)
     }
-  )
-  if(is.matrix(x)){
+  })
+  if (is.matrix(x)) {
     return(rowSums(result))
-  } else{
+  } else {
     return(sum(result))
   }
 }
@@ -433,10 +572,12 @@ sliouv <- function(theta, x, family, alphavec){
 #' distribution at the resulting Liouville vector.
 #' @rdname Liouville
 #' @export
-pliouv <- function(x, theta, family, alphavec){
+pliouv <- function(x, theta, family, alphavec) {
   alphavec <- as.integer(alphavec)
-  if(isTRUE(any(alphavec==0))){stop("Invalid parameters")}
-  family <-  match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
+  if (isTRUE(any(alphavec == 0))) {
+    stop("Invalid parameters")
+  }
+  family <- match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
   sliouv(theta, isliouv_m(x, family, alphavec, theta), family, alphavec)
 }
 
@@ -444,27 +585,44 @@ pliouv <- function(x, theta, family, alphavec){
 ## Liouville copula density function
 #' @rdname Liouville
 #' @export
-dliouv <- function(x, family, alphavec, theta, is.log = FALSE){
+dliouv <- function(x, family, alphavec, theta, is.log = FALSE) {
   alphavec <- as.integer(alphavec)
-  if(isTRUE(any(alphavec==0))){stop("Invalid parameters")}
-  family <-  match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
-  if(!dim(x)[2] == length(alphavec))
-  {
+  if (isTRUE(any(alphavec == 0))) {
+    stop("Invalid parameters")
+  }
+  family <- match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
+  if (!dim(x)[2] == length(alphavec)) {
     stop("Invalid argument: alpha and x are not of same length")
   }
   #Check for validity of the returned parameter in light of family
-  alpha <-  sum(alphavec)
-  x.norm <-  rowSums(x)
-  psi.alpha <-  switch(family,
-                      gumbel = copGumbel@absdPsi(x.norm, theta = theta, degree = alpha, log = TRUE),
-                      clayton = copClayton@absdPsi(x.norm*theta, theta = theta, degree = alpha, log = TRUE)+alpha*log(theta),
-                      frank = copFrank@absdPsi(x.norm, theta = theta, degree = alpha, log = TRUE),
-                      AMH = copAMH@absdPsi(x.norm, theta = theta, degree = alpha, log = TRUE),
-                      joe = copJoe@absdPsi(x.norm, theta = theta, degree = alpha, log = TRUE))
-  arg1 <-  t(apply(x, 1, function(x){(alphavec-1)*log(x)}))
-  return_val <-  sum(arg1)+sum(psi.alpha)-dim(x)[1]*sum(lgamma(alphavec))
-  if(is.log){return(return_val)
-  } else{
+  alpha <- sum(alphavec)
+  x.norm <- rowSums(x)
+  psi.alpha <- switch(
+    family,
+    gumbel = copGumbel@absdPsi(
+      x.norm,
+      theta = theta,
+      degree = alpha,
+      log = TRUE
+    ),
+    clayton = copClayton@absdPsi(
+      x.norm * theta,
+      theta = theta,
+      degree = alpha,
+      log = TRUE
+    ) +
+      alpha * log(theta),
+    frank = copFrank@absdPsi(x.norm, theta = theta, degree = alpha, log = TRUE),
+    AMH = copAMH@absdPsi(x.norm, theta = theta, degree = alpha, log = TRUE),
+    joe = copJoe@absdPsi(x.norm, theta = theta, degree = alpha, log = TRUE)
+  )
+  arg1 <- t(apply(x, 1, function(x) {
+    (alphavec - 1) * log(x)
+  }))
+  return_val <- sum(arg1) + sum(psi.alpha) - dim(x)[1] * sum(lgamma(alphavec))
+  if (is.log) {
+    return(return_val)
+  } else {
     return(exp(return_val))
   }
 }
@@ -474,17 +632,32 @@ dliouv <- function(x, family, alphavec, theta, is.log = FALSE){
 ## Marginal density function of Liouville copulas
 #' @rdname Liouville_marginal
 #' @export
-dliouvm <-  function(x, family, alpha, theta){
-  if(ncol(as.matrix(x))>1) stop("x should be a vector or a n by 1 matrix")
+dliouvm <- function(x, family, alpha, theta) {
+  if (ncol(as.matrix(x)) > 1) stop("x should be a vector or a n by 1 matrix")
   alpha <- as.integer(alpha)
-  if(alpha==0){stop("Invalid parameter alpha")}
-  family <-  match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
-  val <-  switch(family,
-                gumbel = x^(alpha-1)/gamma(alpha)*copGumbel@absdPsi(x, theta = theta, degree = alpha),
-                clayton = x^(alpha-1)/gamma(alpha)*copClayton@absdPsi(t = theta*x, theta, degree = alpha)*(theta^alpha),
-                frank = x^(alpha-1)/gamma(alpha)*copFrank@absdPsi(x, theta = theta, degree = alpha),
-                AMH = x^(alpha-1)/gamma(alpha)*copAMH@absdPsi(x, theta = theta, degree = alpha),
-                joe = x^(alpha-1)/gamma(alpha)*copJoe@absdPsi(x, theta = theta, degree = alpha))
+  if (alpha == 0) {
+    stop("Invalid parameter alpha")
+  }
+  family <- match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
+  val <- switch(
+    family,
+    gumbel = x^(alpha - 1) /
+      gamma(alpha) *
+      copGumbel@absdPsi(x, theta = theta, degree = alpha),
+    clayton = x^(alpha - 1) /
+      gamma(alpha) *
+      copClayton@absdPsi(t = theta * x, theta, degree = alpha) *
+      (theta^alpha),
+    frank = x^(alpha - 1) /
+      gamma(alpha) *
+      copFrank@absdPsi(x, theta = theta, degree = alpha),
+    AMH = x^(alpha - 1) /
+      gamma(alpha) *
+      copAMH@absdPsi(x, theta = theta, degree = alpha),
+    joe = x^(alpha - 1) /
+      gamma(alpha) *
+      copJoe@absdPsi(x, theta = theta, degree = alpha)
+  )
   return(pmax(val, 0))
 }
 
@@ -501,35 +674,37 @@ dliouvm <-  function(x, family, alpha, theta){
 #' @param MC.approx whether to use Monte-Carlo approximation for the inverse survival function (default is \code{TRUE})
 #'
 #' @return value of marginal density
-.pliouv.opt_old <-  function(theta, data, family, alphavec, MC.approx = TRUE){
+.pliouv.opt_old <- function(theta, data, family, alphavec, MC.approx = TRUE) {
   alphavec <- as.integer(alphavec)
-  if(isTRUE(any(alphavec==0))){stop("Invalid parameters")}
-  family <-  match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
+  if (isTRUE(any(alphavec == 0))) {
+    stop("Invalid parameters")
+  }
+  family <- match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
   #changed order of parameters for optimization functions
-  illegalpar <-  switch(family,
-                       clayton = copClayton@paraConstr(theta),
-                       gumbel = copGumbel@paraConstr(theta),
-                       frank = copFrank@paraConstr(theta),
-                       AMH = copAMH@paraConstr(theta),
-                       joe = copJoe@paraConstr(theta))
-  if(!illegalpar)
-    stop("Illegal parameter value")
-  n <-  dim(data)[1]
-  d <-  dim(data)[2]
+  illegalpar <- switch(
+    family,
+    clayton = copClayton@paraConstr(theta),
+    gumbel = copGumbel@paraConstr(theta),
+    frank = copFrank@paraConstr(theta),
+    AMH = copAMH@paraConstr(theta),
+    joe = copJoe@paraConstr(theta)
+  )
+  if (!illegalpar) stop("Illegal parameter value")
+  n <- dim(data)[1]
+  d <- dim(data)[2]
   Xdata = data
-  if(MC.approx){
-    Xdata <-  H_inv(data, alphavec = alphavec, family = family, theta = theta)
+  if (MC.approx) {
+    Xdata <- H_inv(data, alphavec = alphavec, family = family, theta = theta)
   }
-  Xmargin <-  data
-  for (j in 1:d)
-  {
-    if(!MC.approx){
-      Xdata[, j] <-  isliouvm(data[, j], family, alphavec[j], theta)
+  Xmargin <- data
+  for (j in 1:d) {
+    if (!MC.approx) {
+      Xdata[, j] <- isliouvm(data[, j], family, alphavec[j], theta)
     }
-    Xmargin[, j] <-  log(dliouvm(Xdata[, j], family, alphavec[j], theta))
+    Xmargin[, j] <- log(dliouvm(Xdata[, j], family, alphavec[j], theta))
   }
-  numerator.log <-  dliouv(Xdata, family, alphavec, theta, is.log = TRUE)
-  denominator.log <-  sum(Xmargin)
+  numerator.log <- dliouv(Xdata, family, alphavec, theta, is.log = TRUE)
+  denominator.log <- sum(Xmargin)
   numerator.log - denominator.log
 }
 
@@ -545,45 +720,98 @@ dliouvm <-  function(x, family, alpha, theta){
 #' @param MC.approx whether to use Monte-Carlo approximation for the inverse survival function (default is \code{TRUE})
 #'
 #' @return value of marginal density
-pliouv.opt <-  function(theta, data, family, alphavec, MC.approx = TRUE){
-  family <-  match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
+pliouv.opt <- function(theta, data, family, alphavec, MC.approx = TRUE) {
+  family <- match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
   #changed order of parameters for optimization functions
-  illegalpar <-  switch(family,
-                       clayton = copClayton@paraConstr(theta),
-                       gumbel = copGumbel@paraConstr(theta),
-                       frank = copFrank@paraConstr(theta),
-                       AMH = copAMH@paraConstr(theta),
-                       joe = copJoe@paraConstr(theta))
-  if(!illegalpar)
-    stop("Illegal parameter value")
-  n <-  dim(data)[1]
-  d <-  dim(data)[2]
+  illegalpar <- switch(
+    family,
+    clayton = copClayton@paraConstr(theta),
+    gumbel = copGumbel@paraConstr(theta),
+    frank = copFrank@paraConstr(theta),
+    AMH = copAMH@paraConstr(theta),
+    joe = copJoe@paraConstr(theta)
+  )
+  if (!illegalpar) stop("Illegal parameter value")
+  n <- dim(data)[1]
+  d <- dim(data)[2]
   Xdata = data
-  if(MC.approx == TRUE){
-    Xdata <-  H_inv(data, alphavec = alphavec, family = family, theta = theta)
+  if (MC.approx == TRUE) {
+    Xdata <- H_inv(data, alphavec = alphavec, family = family, theta = theta)
   }
-  Xmargin <-  data
-  for (j in 1:d){
-    if(MC.approx == FALSE){
-      Xdata[, j] <-  isliouvm(data[, j], family, alphavec[j], theta)
+  Xmargin <- data
+  for (j in 1:d) {
+    if (MC.approx == FALSE) {
+      Xdata[, j] <- isliouvm(data[, j], family, alphavec[j], theta)
     }
-    Xmargin[, j] <-  switch(family,
-                          gumbel = copGumbel@absdPsi(Xdata[, j], theta = theta, degree = alphavec[j], log = TRUE),
-                          clayton = copClayton@absdPsi(t = theta*Xdata[, j], theta, degree = alphavec[j], log = TRUE),
-                          frank = copFrank@absdPsi(Xdata[, j], theta = theta, degree = alphavec[j], log = TRUE),
-                          AMH = copAMH@absdPsi(Xdata[, j], theta = theta, degree = alphavec[j], log = TRUE),
-                          joe = copJoe@absdPsi(Xdata[, j], theta = theta, degree = alphavec[j], log = TRUE)
+    Xmargin[, j] <- switch(
+      family,
+      gumbel = copGumbel@absdPsi(
+        Xdata[, j],
+        theta = theta,
+        degree = alphavec[j],
+        log = TRUE
+      ),
+      clayton = copClayton@absdPsi(
+        t = theta * Xdata[, j],
+        theta,
+        degree = alphavec[j],
+        log = TRUE
+      ),
+      frank = copFrank@absdPsi(
+        Xdata[, j],
+        theta = theta,
+        degree = alphavec[j],
+        log = TRUE
+      ),
+      AMH = copAMH@absdPsi(
+        Xdata[, j],
+        theta = theta,
+        degree = alphavec[j],
+        log = TRUE
+      ),
+      joe = copJoe@absdPsi(
+        Xdata[, j],
+        theta = theta,
+        degree = alphavec[j],
+        log = TRUE
+      )
     )
   }
   alpha = sum(alphavec)
-  numerator.log <-  sum(switch(family,
-                              gumbel = copGumbel@absdPsi(rowSums(Xdata), theta = theta, degree = alpha, log = TRUE),
-                              clayton = copClayton@absdPsi(t = theta*rowSums(Xdata), theta, degree = alpha, log = TRUE),
-                              frank = copFrank@absdPsi(rowSums(Xdata), theta = theta, degree = alpha, log = TRUE),
-                              AMH = copAMH@absdPsi(rowSums(Xdata), theta = theta, degree = alpha, log = TRUE),
-                              joe = copJoe@absdPsi(rowSums(Xdata), theta = theta, degree = alpha, log = TRUE)
+  numerator.log <- sum(switch(
+    family,
+    gumbel = copGumbel@absdPsi(
+      rowSums(Xdata),
+      theta = theta,
+      degree = alpha,
+      log = TRUE
+    ),
+    clayton = copClayton@absdPsi(
+      t = theta * rowSums(Xdata),
+      theta,
+      degree = alpha,
+      log = TRUE
+    ),
+    frank = copFrank@absdPsi(
+      rowSums(Xdata),
+      theta = theta,
+      degree = alpha,
+      log = TRUE
+    ),
+    AMH = copAMH@absdPsi(
+      rowSums(Xdata),
+      theta = theta,
+      degree = alpha,
+      log = TRUE
+    ),
+    joe = copJoe@absdPsi(
+      rowSums(Xdata),
+      theta = theta,
+      degree = alpha,
+      log = TRUE
+    )
   ))
-  denominator.log <-  sum(Xmargin)
+  denominator.log <- sum(Xmargin)
   numerator.log - denominator.log
 }
 ##########################################################################
@@ -616,106 +844,152 @@ pliouv.opt <-  function(theta, data, family, alphavec, MC.approx = TRUE){
 #'  lattice.mat <- t(combn(1:3,2))
 #'  liouv.maxim.mm(data=data, family="gumbel", lattice.mat=lattice.mat, return_all=FALSE)
 #' }
-liouv.maxim <- function(data, family, interval, boundary = NULL, lattice.mat = NULL, return_all = FALSE, MC.approx = TRUE){
-  family <-  match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
+liouv.maxim <- function(
+  data,
+  family,
+  interval,
+  boundary = NULL,
+  lattice.mat = NULL,
+  return_all = FALSE,
+  MC.approx = TRUE
+) {
+  family <- match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
   stopifnot(!is.null(lattice.mat) || !is.null(boundary))
-  if(!is.null(boundary)){stopifnot(length(boundary) == dim(data)[2]) }
-  if(!is.null(lattice.mat)){stopifnot(ncol(lattice.mat) == ncol(data)) }
-    stopifnot(length(interval) == 2, interval[1]<interval[2],
-            switch(family, clayton = copClayton@paraConstr(interval[1]),
-                     gumbel = copGumbel@paraConstr(interval[1]),
-                     frank = copFrank@paraConstr(interval[1]),
-                     AMH = copAMH@paraConstr(interval[1]),
-                     joe = copJoe@paraConstr(interval[1])),
-              switch(family, clayton = copClayton@paraConstr(interval[2]),
-                     gumbel = copGumbel@paraConstr(interval[2]),
-                     frank = copFrank@paraConstr(interval[2]),
-                     AMH = copAMH@paraConstr(interval[2]),
-                     joe = copJoe@paraConstr(interval[2])))
+  if (!is.null(boundary)) {
+    stopifnot(length(boundary) == dim(data)[2])
+  }
+  if (!is.null(lattice.mat)) {
+    stopifnot(ncol(lattice.mat) == ncol(data))
+  }
+  stopifnot(
+    length(interval) == 2,
+    interval[1] < interval[2],
+    switch(
+      family,
+      clayton = copClayton@paraConstr(interval[1]),
+      gumbel = copGumbel@paraConstr(interval[1]),
+      frank = copFrank@paraConstr(interval[1]),
+      AMH = copAMH@paraConstr(interval[1]),
+      joe = copJoe@paraConstr(interval[1])
+    ),
+    switch(
+      family,
+      clayton = copClayton@paraConstr(interval[2]),
+      gumbel = copGumbel@paraConstr(interval[2]),
+      frank = copFrank@paraConstr(interval[2]),
+      AMH = copAMH@paraConstr(interval[2]),
+      joe = copJoe@paraConstr(interval[2])
+    )
+  )
 
-  if(is.null(lattice.mat)){
+  if (is.null(lattice.mat)) {
     term <- list()
-    for(i in 1:length(boundary)){
+    for (i in 1:length(boundary)) {
       term[[i]] = 1:boundary[i]
     }
-    lattice.mat <- matrix(unlist(expand.grid(term)),ncol=length(boundary))
+    lattice.mat <- matrix(unlist(expand.grid(term)), ncol = length(boundary))
   }
   #Define containers
-  like_array  <- array(dim=apply(lattice.mat,2,max))
-  theta_array <- array(dim=apply(lattice.mat,2,max))
+  like_array <- array(dim = apply(lattice.mat, 2, max))
+  theta_array <- array(dim = apply(lattice.mat, 2, max))
   #Optimization over theta
-  for(i in 1:nrow(lattice.mat)){
-  lattice.vec <- lattice.mat[i,]
-  # Choice of maximization function, see http://cran.r-project.org/web/views/Optimization.html
-  res <- optimise(pliouv.opt, data = data, family = family, alphavec = lattice.vec,
-             interval = interval, maximum = TRUE, MC.approx = MC.approx)
-   theta_array[matrix(lattice.vec, 1)] <- res$maximum
+  for (i in 1:nrow(lattice.mat)) {
+    lattice.vec <- lattice.mat[i, ]
+    # Choice of maximization function, see http://cran.r-project.org/web/views/Optimization.html
+    res <- optimise(
+      pliouv.opt,
+      data = data,
+      family = family,
+      alphavec = lattice.vec,
+      interval = interval,
+      maximum = TRUE,
+      MC.approx = MC.approx
+    )
+    theta_array[matrix(lattice.vec, 1)] <- res$maximum
     like_array[matrix(lattice.vec, 1)] <- res$objective
   }
   indexed <- which.max(like_array)
-  pos <- which( like_array==max(like_array,na.rm=TRUE) , arr.ind = TRUE )
-  if(return_all){
-    return(list(index = pos,
-                theta_max = theta_array[indexed],
-                theta_val = theta_array,
-                log.lik_max = like_array[indexed],
-                log.lik = like_array))
-  }  else{
-    return(list(index = pos,
-                theta_max = theta_array[indexed], log.lik = like_array[indexed]))
+  pos <- which(like_array == max(like_array, na.rm = TRUE), arr.ind = TRUE)
+  if (return_all) {
+    return(list(
+      index = pos,
+      theta_max = theta_array[indexed],
+      theta_val = theta_array,
+      log.lik_max = like_array[indexed],
+      log.lik = like_array
+    ))
+  } else {
+    return(list(
+      index = pos,
+      theta_max = theta_array[indexed],
+      log.lik = like_array[indexed]
+    ))
   }
 }
 ##########################################################################
 ## Maximize copula likelihood function for Liouville copulas via methods of moments
 #' @export
-liouv.maxim.mm <- function(data, family, boundary = NULL, lattice.mat = NULL, return_all = FALSE, MC.approx = TRUE){
-  family <-  match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
+liouv.maxim.mm <- function(
+  data,
+  family,
+  boundary = NULL,
+  lattice.mat = NULL,
+  return_all = FALSE,
+  MC.approx = TRUE
+) {
+  family <- match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
   stopifnot(!is.null(lattice.mat) || !is.null(boundary))
-  if(is.null(lattice.mat)){
+  if (is.null(lattice.mat)) {
     stopifnot(length(boundary) == dim(data)[2] && dim(data)[2] == 2)
     term <- list()
-    for(i in 1:length(boundary)){
+    for (i in 1:length(boundary)) {
       term[[i]] = 1:as.integer(boundary[i])
     }
-    lattice.mat <- matrix(unlist(expand.grid(term)),ncol=length(boundary))
+    lattice.mat <- matrix(unlist(expand.grid(term)), ncol = length(boundary))
   }
-  if(!is.null(lattice.mat)){
-    stopifnot(ncol(lattice.mat) == ncol(data), ncol(data) == 2) 
+  if (!is.null(lattice.mat)) {
+    stopifnot(ncol(lattice.mat) == ncol(data), ncol(data) == 2)
   }
   if (!requireNamespace("wdm", quietly = TRUE)) {
     # warning("Install package \"wdm\" to speed up calculations.",
     #      call. = FALSE)
-    tau_hat <- cor(x = data[,1],
-                   y = data[,2],
-                   method = "kendall")
-  } else{
-  tau_hat <- wdm::wdm(x = data[,1], 
-                      y = data[,2], 
-                      method = "kendall")
+    tau_hat <- cor(x = data[, 1], y = data[, 2], method = "kendall")
+  } else {
+    tau_hat <- wdm::wdm(x = data[, 1], y = data[, 2], method = "kendall")
   }
   #Create containers for values
-  like_array  <- array(dim=apply(lattice.mat,2,max))
-  theta_array <- array(dim=apply(lattice.mat,2,max))
+  like_array <- array(dim = apply(lattice.mat, 2, max))
+  theta_array <- array(dim = apply(lattice.mat, 2, max))
   #Optimization over theta
-  for(i in 1:nrow(lattice.mat)){
-  lattice.vec <- lattice.mat[i,]
-    theta_hat<- liouv.iTau(tau_hat, family, alphavec = lattice.vec)
+  for (i in 1:nrow(lattice.mat)) {
+    lattice.vec <- lattice.mat[i, ]
+    theta_hat <- liouv.iTau(tau_hat, family, alphavec = lattice.vec)
     theta_array[matrix(lattice.vec, 1)] <- theta_hat
-    like_array[matrix(lattice.vec, 1)] <- pliouv.opt(theta_hat, data, family, lattice.vec, MC.approx = MC.approx)
-
+    like_array[matrix(lattice.vec, 1)] <- pliouv.opt(
+      theta_hat,
+      data,
+      family,
+      lattice.vec,
+      MC.approx = MC.approx
+    )
   }
   #Which is the max
   indexed <- which.max(like_array)
-  pos <- which( like_array==max(like_array,na.rm=TRUE) , arr.ind = TRUE )
-  if(return_all){
-    return(list(index = pos,
-                theta_max = theta_array[indexed],
-                theta_val = theta_array,
-                log.lik_max = like_array[indexed],
-                log.lik = like_array))
-  }  else{
-    return(list(index = pos,
-                theta_max = theta_array[indexed], log.lik = like_array[indexed]))
+  pos <- which(like_array == max(like_array, na.rm = TRUE), arr.ind = TRUE)
+  if (return_all) {
+    return(list(
+      index = pos,
+      theta_max = theta_array[indexed],
+      theta_val = theta_array,
+      log.lik_max = like_array[indexed],
+      log.lik = like_array
+    ))
+  } else {
+    return(list(
+      index = pos,
+      theta_max = theta_array[indexed],
+      log.lik = like_array[indexed]
+    ))
   }
 }
 
@@ -729,43 +1003,80 @@ liouv.maxim.mm <- function(data, family, boundary = NULL, lattice.mat = NULL, re
 #' @param alphavec vector of Dirichlet allocations (must be a vector of integers)
 #'
 #' @return value of \eqn{\tau}{tau}
-.liouv.Tau_s <- function(theta, family, alphavec){
-  family <-  match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
-  if(length(alphavec) != 2)
+.liouv.Tau_s <- function(theta, family, alphavec) {
+  family <- match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
+  if (length(alphavec) != 2)
     stop("Illegal parameter length - only implemented for the bivariate case")
-  a1 <- alphavec[1]; a2 <- alphavec[2]; a <- a1+a2
+  a1 <- alphavec[1]
+  a2 <- alphavec[2]
+  a <- a1 + a2
 
-  if(family == "clayton"){
-    express_coef_clayton <- function(i, j, theta, a){
-      return(exp(lgamma(1/theta+i+j)+lgamma(1/theta+a)+lgamma(2/theta)+lgamma(a+i+j)-
-                   2*log(theta)-2*lgamma(1/theta+1)-lgamma(2/theta+i+j+a)-lgamma(a)))
+  if (family == "clayton") {
+    express_coef_clayton <- function(i, j, theta, a) {
+      return(exp(
+        lgamma(1 / theta + i + j) +
+          lgamma(1 / theta + a) +
+          lgamma(2 / theta) +
+          lgamma(a + i + j) -
+          2 * log(theta) -
+          2 * lgamma(1 / theta + 1) -
+          lgamma(2 / theta + i + j + a) -
+          lgamma(a)
+      ))
     }
   }
-  if(family == "gumbel"){
-    express_coef_gumb <- function(index_k, index_l, theta, a){
-      if(index_l == 0){
-        d1 <- .coeffG(d = index_k, alpha = 1/theta, method = "direct", log = TRUE)
+  if (family == "gumbel") {
+    express_coef_gumb <- function(index_k, index_l, theta, a) {
+      if (index_l == 0) {
+        d1 <- .coeffG(
+          d = index_k,
+          alpha = 1 / theta,
+          method = "direct",
+          log = TRUE
+        )
         intern <- seq(1:index_k)
-        d2 <- lgamma(intern)-intern*log(2)
-        return(theta*sum(exp(d1+d2))/gamma(a))
-      }      else{
-        d1 <- outer(.coeffG(d = index_k, alpha = 1/theta, method = "direct", log = TRUE),
-                  .coeffG(d = index_l, alpha = 1/theta, method = "direct", log = TRUE), "+")
+        d2 <- lgamma(intern) - intern * log(2)
+        return(theta * sum(exp(d1 + d2)) / gamma(a))
+      } else {
+        d1 <- outer(
+          .coeffG(
+            d = index_k,
+            alpha = 1 / theta,
+            method = "direct",
+            log = TRUE
+          ),
+          .coeffG(
+            d = index_l,
+            alpha = 1 / theta,
+            method = "direct",
+            log = TRUE
+          ),
+          "+"
+        )
         intern <- outer(seq(1:index_k), seq(1:index_l), "+")
-        d2 <- lgamma(intern)-intern*log(2)
-        return(theta*sum(exp(d1+d2))/gamma(a))
+        d2 <- lgamma(intern) - intern * log(2)
+        return(theta * sum(exp(d1 + d2)) / gamma(a))
       }
     }
   }
-  count <- sum(sapply(0:(a1-1), function(i){
-    sum(sapply(0:(a2-1), function(j){
-      exp(lbeta(a1+i, a2+j)-lbeta(a1, a2)-lgamma(i+1)-lgamma(j+1))*
-        switch(family,
-               gumbel = express_coef_gumb(index_k = a, index_l = i+j, theta, a = a),
-               clayton = express_coef_clayton(i = i, j = j, theta, a = a))
+  count <- sum(sapply(0:(a1 - 1), function(i) {
+    sum(sapply(0:(a2 - 1), function(j) {
+      exp(
+        lbeta(a1 + i, a2 + j) - lbeta(a1, a2) - lgamma(i + 1) - lgamma(j + 1)
+      ) *
+        switch(
+          family,
+          gumbel = express_coef_gumb(
+            index_k = a,
+            index_l = i + j,
+            theta,
+            a = a
+          ),
+          clayton = express_coef_clayton(i = i, j = j, theta, a = a)
+        )
     }))
   }))
-  return(count*4-1)
+  return(count * 4 - 1)
 }
 #' Computes Kendall's tau for Clayton or Gumbel Liouville copula
 #'
@@ -791,20 +1102,29 @@ liouv.Tau = Vectorize(FUN = .liouv.Tau_s, vectorize.args = "theta")
 #' @param alphavec vector of Dirichlet allocations (must be a vector of integers)
 #'
 #' @return Value of theta
-.liouv.iTau_s <-  function(tau_hat, family, alphavec){
+.liouv.iTau_s <- function(tau_hat, family, alphavec) {
   alphavec <- as.integer(alphavec)
-  if(isTRUE(any(alphavec==0))){stop("Invalid parameters")}
-  family <-  match.arg(family, c("clayton", "gumbel"))
-  if(family != "gumbel" && family != "clayton")
-    stop("Not yet implemented for this family")
-  invtau <-  function(theta, tau, family, alphavec)
-  {
-    liouv.Tau(theta, family, alphavec)-tau
+  if (isTRUE(any(alphavec == 0))) {
+    stop("Invalid parameters")
   }
-  lb <- switch(family, gumbel = 1+1e-60, clayton = 1e-60)
+  family <- match.arg(family, c("clayton", "gumbel"))
+  if (family != "gumbel" && family != "clayton")
+    stop("Not yet implemented for this family")
+  invtau <- function(theta, tau, family, alphavec) {
+    liouv.Tau(theta, family, alphavec) - tau
+  }
+  lb <- switch(family, gumbel = 1 + 1e-60, clayton = 1e-60)
   #Not implemented for negative theta values (Clayton family)
-  out <-  uniroot(invtau, lower = lb, upper = 100, f.lower = -1, f.upper = 1,
-                 alphavec = alphavec, tau = tau_hat, family = family)
+  out <- uniroot(
+    invtau,
+    lower = lb,
+    upper = 100,
+    f.lower = -1,
+    f.upper = 1,
+    alphavec = alphavec,
+    tau = tau_hat,
+    family = family
+  )
   out$root
 }
 #' Moment estimate for theta derived from Kendall's tau formula
@@ -844,35 +1164,59 @@ liouv.iTau = Vectorize(.liouv.iTau_s, "tau_hat")
 #' sum(abs(H_inv(u=u, family="frank", alphavec=c(2,3), theta=2)-
 #' isliouv_m(u=u, family="frank", alphavec=c(2,3), theta=2)))
 #' }
-H_inv <-  function(u, alphavec, family, theta, MC = 1e5L, TRUNC = FALSE){
+H_inv <- function(u, alphavec, family, theta, MC = 1e5L, TRUNC = FALSE) {
   alphavec <- as.integer(alphavec)
-  if(isTRUE(any(alphavec==0))){stop("Invalid parameters")}
-  family <-  match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
-  d <-  sum(alphavec)
+  if (isTRUE(any(alphavec == 0))) {
+    stop("Invalid parameters")
+  }
+  family <- match.arg(family, c("clayton", "gumbel", "frank", "AMH", "joe"))
+  d <- sum(alphavec)
   #Parametrization for Clayton is different
-  if(family == "clayton"){
-    mc <- 	(rCopula(n = MC, claytonCopula(param = theta, dim = d))^(-theta)-1)/theta
-  }	else if(family=="AMH") {
-     mc <-  iPsi(get(paste(tolower(family), "Copula", sep = ""))(param = theta),
-               rarchi(n = MC, family="AMH", theta = theta, d = d))
-  } else{
-    mc <-  iPsi(get(paste(tolower(family), "Copula", sep = ""))(param = theta),
-               rCopula(n = MC, get(paste(tolower(family), "Copula", sep = ""))(param = theta, dim = d)))
+  if (family == "clayton") {
+    mc <- (rCopula(n = MC, claytonCopula(param = theta, dim = d))^(-theta) -
+      1) /
+      theta
+  } else if (family == "AMH") {
+    mc <- iPsi(
+      get(paste(tolower(family), "Copula", sep = ""))(param = theta),
+      rarchi(n = MC, family = "AMH", theta = theta, d = d)
+    )
+  } else {
+    mc <- iPsi(
+      get(paste(tolower(family), "Copula", sep = ""))(param = theta),
+      rCopula(
+        n = MC,
+        get(paste(tolower(family), "Copula", sep = ""))(param = theta, dim = d)
+      )
+    )
   }
-  mc <-  .marginCombo(alphavec, mc)
+  mc <- .marginCombo(alphavec, mc)
   inverse = numeric()
-  for(i in 1:length(alphavec)){
-    inverse = cbind(inverse, as.numeric(quantile(mc[, i], probs = (1-u[, i]))))
+  for (i in 1:length(alphavec)) {
+    inverse = cbind(
+      inverse,
+      as.numeric(quantile(mc[, i], probs = (1 - u[, i])))
+    )
   }
-  if(TRUNC){
-    hquant = which(u<0.025, arr.ind = TRUE)
-    for(i in 1:(dim(hquant)[1])){
-      inverse[hquant[i, 1], hquant[i, 2]] = 	isliouvm(u[hquant[i, 1], hquant[i, 2]], family, alphavec[hquant[i, 2]], theta)
+  if (TRUNC) {
+    hquant = which(u < 0.025, arr.ind = TRUE)
+    for (i in 1:(dim(hquant)[1])) {
+      inverse[hquant[i, 1], hquant[i, 2]] = isliouvm(
+        u[hquant[i, 1], hquant[i, 2]],
+        family,
+        alphavec[hquant[i, 2]],
+        theta
+      )
     }
 
-    hquant = which(u>0.975, arr.ind = TRUE)
-    for(i in 1:(dim(hquant)[1])){
-      inverse[hquant[i, 1], hquant[i, 2]] = 	isliouvm(u[hquant[i, 1], hquant[i, 2]], family, alphavec[hquant[i, 2]], theta)
+    hquant = which(u > 0.975, arr.ind = TRUE)
+    for (i in 1:(dim(hquant)[1])) {
+      inverse[hquant[i, 1], hquant[i, 2]] = isliouvm(
+        u[hquant[i, 1], hquant[i, 2]],
+        family,
+        alphavec[hquant[i, 2]],
+        theta
+      )
     }
   }
   return(inverse)
@@ -893,90 +1237,136 @@ H_inv <-  function(u, alphavec, family, theta, MC = 1e5L, TRUNC = FALSE){
 #' @param a \eqn{L_1}{L1}-norm of Dirichlet allocation vector
 #'
 #' @return Clayton coefficient
-express_coef_clayton <- function(i, j, theta, a){
-  return(exp(lgamma(1/theta+i+j)+lgamma(1/theta+a)+lgamma(2/theta)+lgamma(a+i+j)-
-               2*log(theta)-2*lgamma(1/theta+1)-lgamma(2/theta+i+j+a)-lgamma(a)))
+express_coef_clayton <- function(i, j, theta, a) {
+  return(exp(
+    lgamma(1 / theta + i + j) +
+      lgamma(1 / theta + a) +
+      lgamma(2 / theta) +
+      lgamma(a + i + j) -
+      2 * log(theta) -
+      2 * lgamma(1 / theta + 1) -
+      lgamma(2 / theta + i + j + a) -
+      lgamma(a)
+  ))
 }
 
 # Note: function coeffG is a copy of that found in the `copula' package
 # the latter is unexported, and CRAN won't allow access via :::
 # All copyrights and credits to copula authors
 # (c) Marius Hofert, Ivan Kojadinovic, Martin Maechler, and Jun Yan
-.coeffG <-  function (d, alpha, method = c("sort", "horner", "direct", "dsumSibuya",
-paste("dsSib", eval(formals(dsumSibuya)$method), sep = ".")),
-log = FALSE, verbose = FALSE)
-{
-stopifnot(is.numeric(d), length(d) == 1, d >= 1, length(alpha) ==
-    1, 0 < alpha, alpha <= 1)
-a <-  numeric(d)
-method <-  match.arg(method)
-if (method == "dsumSibuya") {
-    message("method 'dsumSibuya' is deprecated.\n  ", "use method = 'dsSib.log' instead")
-    method <-  "dsSib.log"
-}
-Meth <-  if (grepl("^dsSib", method)) {
-    meth.dsSib <-  sub("^dsSib\\.(.*)", "\\1", method)
+.coeffG <- function(
+  d,
+  alpha,
+  method = c(
+    "sort",
+    "horner",
+    "direct",
+    "dsumSibuya",
+    paste("dsSib", eval(formals(dsumSibuya)$method), sep = ".")
+  ),
+  log = FALSE,
+  verbose = FALSE
+) {
+  stopifnot(
+    is.numeric(d),
+    length(d) == 1,
+    d >= 1,
+    length(alpha) == 1,
+    0 < alpha,
+    alpha <= 1
+  )
+  a <- numeric(d)
+  method <- match.arg(method)
+  if (method == "dsumSibuya") {
+    message(
+      "method 'dsumSibuya' is deprecated.\n  ",
+      "use method = 'dsSib.log' instead"
+    )
+    method <- "dsSib.log"
+  }
+  Meth <- if (grepl("^dsSib", method)) {
+    meth.dsSib <- sub("^dsSib\\.(.*)", "\\1", method)
     "dsSib"
-}
-else method
-switch(Meth, sort = {
-    ls <-  log(abs(Stirling1.all(d)))
-    lS <-  lapply(1:d, function(n) log(Stirling2.all(n)))
-    wrong.sign <-  integer()
-    for (k in 1:d) {
-        j <-  k:d
-        b <-  j * log(alpha) + ls[j] + unlist(lapply(j, function(i) lS[[i]][k]))
-        b.max <-  max(b)
-        exponents <-  b - b.max
-        exps <-  exp(exponents)
-        even <-  if (k == d) NULL else seq(2, d - k + 1, by = 2)
-        odd <-  seq(1, d - k + 1, by = 2)
-        sum.neg <-  sum(sort(exps[even]))
-        sum.pos <-  sum(sort(exps[odd]))
-        sum. <-  sum.pos - sum.neg
-        a[k] <-  if (log) b.max + log(sum.) else exp(b.max) *
+  } else method
+  switch(
+    Meth,
+    sort = {
+      ls <- log(abs(Stirling1.all(d)))
+      lS <- lapply(1:d, function(n) log(Stirling2.all(n)))
+      wrong.sign <- integer()
+      for (k in 1:d) {
+        j <- k:d
+        b <- j * log(alpha) + ls[j] + unlist(lapply(j, function(i) lS[[i]][k]))
+        b.max <- max(b)
+        exponents <- b - b.max
+        exps <- exp(exponents)
+        even <- if (k == d) NULL else seq(2, d - k + 1, by = 2)
+        odd <- seq(1, d - k + 1, by = 2)
+        sum.neg <- sum(sort(exps[even]))
+        sum.pos <- sum(sort(exps[odd]))
+        sum. <- sum.pos - sum.neg
+        a[k] <- if (log) b.max + log(sum.) else
+          exp(b.max) *
             sum.
         if (sum.neg > sum.pos) {
-            if (verbose) message("sum.neg > sum.pos for k = ",
-              k)
-            wrong.sign <-  c(wrong.sign, k)
+          if (verbose) message("sum.neg > sum.pos for k = ", k)
+          wrong.sign <- c(wrong.sign, k)
         }
-    }
-    if (length(wrong.sign)) attr(a, "wrong.signs") <-  wrong.sign
-    a
-}, dsSib = {
-    k <-  1:d
-    ck <-  if (log) c(0, cumsum(log(d:2)))[d:1] else c(1,
-        cumprod(d:2))[d:1]
-    p <-  dsumSibuya(d, k, alpha, method = meth.dsSib, log = log)
-    if (log) p + ck else p * ck
-}, horner = {
-    s.abs <-  abs(Stirling1.all(d))
-    k <-  1:d
-    S <-  lapply(k, Stirling2.all)
-    pol <-  vapply(k, function(k.) {
-        j <-  0:(d - k.)
-        c.j <-  s.abs[j + k.] * vapply(j, function(i) S[[i +
-            k.]][k.], 1)
-        polynEval(c.j, -alpha)
-    }, NA_real_)
-    if (log) k * log(alpha) + log(pol) else alpha^k * pol
-}, direct = {
-    s <-  Stirling1.all(d)
-    k <-  seq_len(d)
-    S <-  lapply(k, Stirling2.all)
-    vapply(k, function(k.) {
-        j <-  k.:d
-        S. <-  vapply(j, function(i) S[[i]][k.], 1)
-        sm <-  sum(alpha^j * s[j] * S.)
-        if (log){
-          log(abs(sm)) 
-    } else {
-      (-1)^(d - k.) * sm
-    }
-    }, NA_real_)
-}, stop(gettextf("unsupported method '%s' in coeffG", method),
-    domain = NA))
+      }
+      if (length(wrong.sign)) attr(a, "wrong.signs") <- wrong.sign
+      a
+    },
+    dsSib = {
+      k <- 1:d
+      ck <- if (log) c(0, cumsum(log(d:2)))[d:1] else c(1, cumprod(d:2))[d:1]
+      p <- dsumSibuya(d, k, alpha, method = meth.dsSib, log = log)
+      if (log) p + ck else p * ck
+    },
+    horner = {
+      s.abs <- abs(Stirling1.all(d))
+      k <- 1:d
+      S <- lapply(k, Stirling2.all)
+      pol <- vapply(
+        k,
+        function(k.) {
+          j <- 0:(d - k.)
+          c.j <- s.abs[j + k.] *
+            vapply(
+              j,
+              function(i)
+                S[[
+                  i +
+                    k.
+                ]][k.],
+              1
+            )
+          polynEval(c.j, -alpha)
+        },
+        NA_real_
+      )
+      if (log) k * log(alpha) + log(pol) else alpha^k * pol
+    },
+    direct = {
+      s <- Stirling1.all(d)
+      k <- seq_len(d)
+      S <- lapply(k, Stirling2.all)
+      vapply(
+        k,
+        function(k.) {
+          j <- k.:d
+          S. <- vapply(j, function(i) S[[i]][k.], 1)
+          sm <- sum(alpha^j * s[j] * S.)
+          if (log) {
+            log(abs(sm))
+          } else {
+            (-1)^(d - k.) * sm
+          }
+        },
+        NA_real_
+      )
+    },
+    stop(gettextf("unsupported method '%s' in coeffG", method), domain = NA)
+  )
 }
 
 ##########################################################################
@@ -992,18 +1382,21 @@ switch(Meth, sort = {
 #' @param a sum of alphavec
 #'
 #' @return Gumbel coefficient
-express_coef_gumb <- function(index_k, index_l, theta, a){
-  if(index_l == 0){
-    d1 <- .coeffG(d = index_k, alpha = 1/theta, method = "direct", log = TRUE)
+express_coef_gumb <- function(index_k, index_l, theta, a) {
+  if (index_l == 0) {
+    d1 <- .coeffG(d = index_k, alpha = 1 / theta, method = "direct", log = TRUE)
     intern <- seq_len(index_k)
-    d2 <- lgamma(intern)-intern*log(2)
-    return(theta*sum(exp(d1+d2))/gamma(a))
-  }  else{
-    d1 <- outer(.coeffG(d = index_k, alpha = 1/theta, method = "direct", log = TRUE),
-              .coeffG(d = index_l, alpha = 1/theta, method = "direct", log = TRUE), "+")
+    d2 <- lgamma(intern) - intern * log(2)
+    return(theta * sum(exp(d1 + d2)) / gamma(a))
+  } else {
+    d1 <- outer(
+      .coeffG(d = index_k, alpha = 1 / theta, method = "direct", log = TRUE),
+      .coeffG(d = index_l, alpha = 1 / theta, method = "direct", log = TRUE),
+      "+"
+    )
     intern <- outer(seq(1:index_k), seq(1:index_l), "+")
-    d2 <- lgamma(intern)-intern*log(2)
-    return(theta*sum(exp(d1+d2))/gamma(a))
+    d2 <- lgamma(intern) - intern * log(2)
+    return(theta * sum(exp(d1 + d2)) / gamma(a))
   }
 }
 
@@ -1015,7 +1408,7 @@ express_coef_gumb <- function(index_k, index_l, theta, a){
 #' Liouvilla copula model. If \eqn{d=2} and the model is either \code{gumbel} or \code{clayton}, the value of
 #' Kendall's \eqn{\tau}{tau} is calculated from the sample, and the confidence interval or the quantiles correspond
 #' to the inverse \eqn{\tau^{-1}(\tau(\theta))}{tau} for the bootstrap quantile values of \eqn{\tau}{tau} (using monotonicity).
-#' 
+#'
 #' Install package \code{wdm} to speed up calculation of Kendall's tau.
 #'
 #' Since no closed-form formulas exist for the other models or in higher dimension,
@@ -1039,75 +1432,96 @@ express_coef_gumb <- function(index_k, index_l, theta, a){
 #' and the bootstrap values of Kendall's tau in \code{boot_tau} if \eqn{d=2} and the model is either \code{gumbel} or \code{clayton}.
 #' Otherwise, the list contains \code{boot_theta}.
 #' @export
-theta.bci <- function(B = 1999, 
-                      family, 
-                      alphavec, 
-                      n, 
-                      theta.hat, 
-                      quant = c(0.025,0.975), 
-                      silent = FALSE){
-  family <-  match.arg(arg = family, 
-                       several.ok = FALSE,
-                       choices = c("clayton",
-                                   "gumbel", 
-                                   "frank", 
-                                   "AMH", 
-                                   "joe"))
+theta.bci <- function(
+  B = 1999,
+  family,
+  alphavec,
+  n,
+  theta.hat,
+  quant = c(0.025, 0.975),
+  silent = FALSE
+) {
+  family <- match.arg(
+    arg = family,
+    several.ok = FALSE,
+    choices = c("clayton", "gumbel", "frank", "AMH", "joe")
+  )
   alphavec <- as.integer(alphavec)
-  if(isTRUE(any(alphavec==0))){
+  if (isTRUE(any(alphavec == 0))) {
     stop("Invalid parameters")
-    }
-  illegalpar <-  
-    switch(family,
-           clayton = copClayton@paraConstr(theta.hat),
-           gumbel = copGumbel@paraConstr(theta.hat),
-           frank = copFrank@paraConstr(theta.hat),
-           AMH = copAMH@paraConstr(theta.hat),
-           joe = copJoe@paraConstr(theta.hat))
-  if(!illegalpar){
+  }
+  illegalpar <-
+    switch(
+      family,
+      clayton = copClayton@paraConstr(theta.hat),
+      gumbel = copGumbel@paraConstr(theta.hat),
+      frank = copFrank@paraConstr(theta.hat),
+      AMH = copAMH@paraConstr(theta.hat),
+      joe = copJoe@paraConstr(theta.hat)
+    )
+  if (!illegalpar) {
     stop("Illegal parameter value")
   }
   d <- length(alphavec)
-  if(d == 2 && family %in% c("gumbel","clayton")){
-    boot.rep <- sapply(seq_len(B), function(x){
+  if (d == 2 && family %in% c("gumbel", "clayton")) {
+    boot.rep <- sapply(seq_len(B), function(x) {
       if (!requireNamespace("wdm", quietly = TRUE)) {
-        cor(x = rliouv(n = n, 
-                       family = family, 
-                       alphavec = alphavec,
-                       theta = theta.hat),
-            method = "kendall")
-      } else{
-        wdm::wdm(x = rliouv(n = n, 
-                           family = family, 
-                           alphavec = alphavec,
-                           theta = theta.hat),
-                            method = "kendall")
-      } })
+        cor(
+          x = rliouv(
+            n = n,
+            family = family,
+            alphavec = alphavec,
+            theta = theta.hat
+          ),
+          method = "kendall"
+        )
+      } else {
+        wdm::wdm(
+          x = rliouv(
+            n = n,
+            family = family,
+            alphavec = alphavec,
+            theta = theta.hat
+          ),
+          method = "kendall"
+        )
+      }
+    })
     quantiles = NaN
-    if(is.vector(quant)){
+    if (is.vector(quant)) {
       quantiles = liouv.iTau(
-        quantile(boot.rep, probs = quant), 
-        family, alphavec)
+        quantile(boot.rep, probs = quant),
+        family,
+        alphavec
+      )
     }
     return(list(quantiles = quantiles, boot_kendall = boot.rep))
-  }  else{
-    boot.rep <- sapply(1:B, function(x){
-      if(silent == FALSE){
+  } else {
+    boot.rep <- sapply(1:B, function(x) {
+      if (silent == FALSE) {
         print(paste("Step", x))
-        }
+      }
       boot.samp <- rliouv(n = n, family, alphavec, theta.hat)
-      boot.opt <- liouv.maxim(boot.samp, family, lattice.mat = as.matrix(t(alphavec)), MC.approx = FALSE,
-                            interval = switch(family, gumbel = c(1.001, 10),
-                                            clayton = c(0.001, 10),
-                                            AMH = c(0.001, 0.999),
-                                            joe = c(1.001, 10),
-                                            frank = c(0.001, 10)))
-      boot.opt$theta_max})
+      boot.opt <- liouv.maxim(
+        boot.samp,
+        family,
+        lattice.mat = as.matrix(t(alphavec)),
+        MC.approx = FALSE,
+        interval = switch(
+          family,
+          gumbel = c(1.001, 10),
+          clayton = c(0.001, 10),
+          AMH = c(0.001, 0.999),
+          joe = c(1.001, 10),
+          frank = c(0.001, 10)
+        )
+      )
+      boot.opt$theta_max
+    })
     quantiles = NaN
-    if(is.vector(quant)){
+    if (is.vector(quant)) {
       quantiles = quantile(boot.rep, probs = quant)
     }
     return(list(quantiles = quantiles, boot_theta = boot.rep))
-
   }
 }

@@ -1,7 +1,7 @@
 Package: lcopula
 Type: Package
 Title: Liouville Copulas
-Version: 1.0.7
+Version: 1.0.8
 Authors@R: c(person("Leo", "Belzile", role = c("aut", "cre"), email = "belzilel@gmail.com", comment = c(ORCID = "0000-0002-9135-014X")),
               person("Christian", " Genest", role = c("aut","ctb")),
               person("Alexander", "J. McNeil", role = "ctb"),
@@ -21,6 +21,6 @@ Depends:
 Suggests:
     wdm
 LinkingTo: Rcpp
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.3
 Encoding: UTF-8
 LazyData: true
